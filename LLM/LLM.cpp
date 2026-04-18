@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <cstdio>
 #include <sstream>
-#include <vector>
 
 std::string runCommand(const std::string& command) {
     std::array<char, 256> buffer{};
@@ -23,26 +22,13 @@ std::string runCommand(const std::string& command) {
     return result;
 }
 
-std::vector<std::string> splitLines(const std::string& text) {
-    std::vector<std::string> lines;
-    std::stringstream ss(text);
-    std::string line;
-
-    while (std::getline(ss, line)) {
-        if (!line.empty()) {
-            lines.push_back(line);
-        }
-    }
-
-    return lines;
-}
-
 int main() {
     std::string repoPath = R"(C:\Users\katew\source\repos\LLM)";
+    std::string worktreePath = R"(C:\Users\katew\source\repos\LLM_feature)";
     std::string baseBranch = "master";
 
     try {
-        std::string branchCmd = "git -C \"" + repoPath + "\" branch --show-current";
+        std::string branchCmd = "git -C \"" + worktreePath + "\" branch --show-current";
         std::string currentBranch = runCommand(branchCmd);
 
         while (!currentBranch.empty() && (currentBranch.back() == '\n' || currentBranch.back() == '\r')) {
@@ -54,16 +40,23 @@ int main() {
 
         std::string changedFilesRaw = runCommand(diffFilesCmd);
 
+        std::cout << "WORKTREE PATH:\n" << worktreePath << "\n\n";
         std::cout << "CURRENT BRANCH:\n" << currentBranch << "\n\n";
         std::cout << "CHANGED FILES BETWEEN BRANCHES:\n" << changedFilesRaw << "\n";
 
-        std::vector<std::string> changedLines = splitLines(changedFilesRaw);
-
         std::string pythonCmd =
-            "py C:\\Users\\katew\\source\\repos\\LLMAgent\\llm_test\\orchestrator.py \"" + repoPath + "\"";
+            "py C:\\Users\\katew\\source\\repos\\LLMAgent\\llm_test\\orchestrator.py \"" + worktreePath + "\"";
 
-        for (const auto& path : changedLines) {
-            pythonCmd += " \"" + path + "\"";
+        std::stringstream ss(changedFilesRaw);
+        std::string line;
+
+        while (std::getline(ss, line)) {
+            if (!line.empty()) {
+                while (!line.empty() && (line.back() == '\r' || line.back() == '\n')) {
+                    line.pop_back();
+                }
+                pythonCmd += " \"" + line + "\"";
+            }
         }
 
         std::string output = runCommand(pythonCmd);
