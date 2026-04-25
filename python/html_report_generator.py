@@ -57,6 +57,17 @@ def save_html_report(project_path, report_data):
     files_with_reverse_deps = summary.get("files_with_reverse_deps_count", 0)
     graph_nodes = summary.get("graph_nodes", 0)
     dependency_edges = summary.get("dependency_edges", 0)
+    files_by_language = summary.get("files_by_language", {})
+
+    language_cards = []
+
+    for language, count in files_by_language.items():
+        language_cards.append(f"""
+        <div class="card">
+            <div class="card-title">{escape(str(language))}</div>
+            <div class="card-value">{escape(str(count))}</div>
+        </div>
+        """)
 
     if high_count > 0 or interfile_count > 0:
         risk_level = "HIGH"
@@ -299,6 +310,11 @@ def save_html_report(project_path, report_data):
         <div class="card-title">Analysis mode</div>
         <div class="card-value">{escape(str(summary.get("analysis_mode", "")))}</div>
     </div>
+</div>
+
+<h2>Languages</h2>
+<div class="summary-grid">
+    {''.join(language_cards)}
 </div>
 
 <h2>File-level Findings</h2>

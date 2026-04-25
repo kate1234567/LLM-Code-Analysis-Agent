@@ -316,7 +316,7 @@ int main() {
     std::string branchName = "feature-test";
     std::string worktreePath = R"(C:\Users\katew\source\repos\LLM_feature)";
     std::string jsonOutputPath = R"(C:\Users\katew\source\repos\LLM\python\project_context.json)";
-    std::string baseBranch = "master";
+    std::string baseBranch = "main";
 
     try {
         ensureWorktree(repoPath, worktreePath, branchName);

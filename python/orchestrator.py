@@ -139,7 +139,7 @@ def classify_source_type(parsed):
     return "fallback"
 
 
-def process_cpp_file(project_id, pr_id, target_file, context_map, graph):
+def process_code_file(project_id, pr_id, target_file, context_map, graph):
     conn = get_connection()
     task_id = None
     has_paired_header = False
@@ -560,9 +560,14 @@ def run_project(project_path, changed_files=None):
         scan_duration = int((time.time() - scan_start) * 1000)
 
         save_log_metric(project_id, pr_id, "scanner", "finish", {
+            "code_files_count": len(data["code_files"]),
             "cpp_count": len(data["cpp_files"]),
             "header_count": len(data["header_files"]),
-            "file_count": len(data["files"])
+            "file_count": len(data["files"]),
+            "files_by_language": {
+                lang: len(files)
+                for lang, files in data.get("files_by_language", {}).items()
+            }
         }, scan_duration, conn=conn)
 
         print("\n[2] BUILDING GRAPH...")
@@ -593,8 +598,8 @@ def run_project(project_path, changed_files=None):
 
         save_project_context(
             project_id=project_id,
-            context_type="cpp_exported_context",
-            content="C++ exported project context",
+            context_type="exported_project_context",
+            content="Exported project context",
             metadata=raw_json_data,
             conn=conn
         )
@@ -622,11 +627,12 @@ def run_project(project_path, changed_files=None):
             "json_path": JSON_CONTEXT_PATH
         }, context_duration, conn=conn)
 
-        analysis_files = data["cpp_files"]
+        analysis_files = []
 
         if changed_files:
-            changed_cpp_files = normalize_changed_paths(project_path, changed_files, data["cpp_files"])
+            changed_code_files = normalize_changed_paths(project_path, changed_files, data["code_files"])
             changed_header_files = normalize_changed_headers(project_path, changed_files, data["header_files"])
+
             impacted_cpp_files = find_impacted_cpp_files_by_headers(
                 changed_header_files,
                 graph,
@@ -634,13 +640,25 @@ def run_project(project_path, changed_files=None):
             )
 
             analysis_files = build_analysis_file_list(
-                changed_cpp_files,
+                changed_code_files,
                 changed_header_files,
                 impacted_cpp_files
             )
 
-            print("\nCHANGED CPP FILES FOR ANALYSIS:")
-            for f in changed_cpp_files:
+            print("\nCHANGED CODE FILES FOR ANALYSIS:")
+            for f in changed_code_files:
+                print(" -", f)
+
+            print("\nCHANGED HEADER FILES:")
+            for h in changed_header_files:
+                print(" -", h)
+
+            print("\nIMPACTED CPP FILES FROM HEADER CHANGES:")
+            for f in impacted_cpp_files:
+                print(" -", f)
+
+            print("\nFINAL ANALYSIS FILES:")
+            for f in analysis_files:
                 print(" -", f)
 
             print("\nCHANGED HEADER FILES:")
@@ -658,18 +676,18 @@ def run_project(project_path, changed_files=None):
         print("\n[4] RUNNING SUBAGENTS IN PARALLEL...\n")
 
         if not analysis_files:
-            print("NO CPP FILES FOUND FOR ANALYSIS")
+            print("NO CODE FILES FOUND FOR ANALYSIS")
             save_log_metric(project_id, pr_id, "orchestrator", "finish", {
-                "status": "no_cpp_files_for_analysis"
+                "status": "no_code_files_for_analysis"
             }, int((time.time() - total_start) * 1000), conn=conn)
             return []
 
         results = []
-        max_workers = min(2, len(analysis_files))
+        max_workers = min(8, len(analysis_files))
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [
-                executor.submit(process_cpp_file, project_id, pr_id, target_file, context_map, graph)
+                executor.submit(process_code_file, project_id, pr_id, target_file, context_map, graph)
                 for target_file in analysis_files
             ]
 
