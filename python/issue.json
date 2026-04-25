@@ -1,0 +1,4 @@
+{
+  "code": "int* p = nullptr; *p = 5;",
+  "issue": "possible null pointer dereference"
+}

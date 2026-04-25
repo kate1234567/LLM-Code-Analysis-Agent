@@ -315,7 +315,7 @@ int main() {
     std::string repoPath = R"(C:\Users\katew\source\repos\LLM)";
     std::string branchName = "feature-test";
     std::string worktreePath = R"(C:\Users\katew\source\repos\LLM_feature)";
-    std::string jsonOutputPath = R"(C:\Users\katew\source\repos\LLMAgent\llm_test\project_context.json)";
+    std::string jsonOutputPath = R"(C:\Users\katew\source\repos\LLM\python\project_context.json)";
     std::string baseBranch = "master";
 
     try {
@@ -359,7 +359,7 @@ int main() {
         std::vector<std::string> changedLines = splitLines(changedFilesRaw);
 
         std::string pythonCmd =
-            "py C:\\Users\\katew\\source\\repos\\LLMAgent\\llm_test\\orchestrator.py \"" + worktreePath + "\"";
+            "py C:\\Users\\katew\\source\\repos\\LLM\\python\\orchestrator.py \"" + worktreePath + "\"";
 
         for (const auto& path : changedLines) {
             pythonCmd += " \"" + path + "\"";
