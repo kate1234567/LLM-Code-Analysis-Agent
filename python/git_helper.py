@@ -1,6 +1,5 @@
 import subprocess
 
-
 def run_git_command(repo_path, args):
     try:
         result = subprocess.run(

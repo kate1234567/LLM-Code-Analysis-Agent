@@ -284,6 +284,18 @@ bool pathExists(const std::string& path) {
     return fs::exists(path);
 }
 
+bool isRelevantChangedFile(const std::string& path) {
+    std::string lower = path;
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+
+    return
+        lower.ends_with(".cpp") ||
+        lower.ends_with(".h") ||
+        lower.ends_with(".hpp") ||
+        lower.ends_with(".py") ||
+        lower.ends_with(".sql");
+}
+
 void ensureWorktree(const std::string& repoPath, const std::string& projectPath, const std::string& branchName) {
     if (pathExists(projectPath)) {
         std::cout << "WORKTREE ALREADY EXISTS:\n" << projectPath << "\n\n";
@@ -332,9 +344,54 @@ std::string cloneRepository(const std::string& url) {
     return tempPath;
 }
 
+std::map<std::string, std::string> loadConfig(const std::string& configPath) {
+    std::map<std::string, std::string> config;
+    std::ifstream file(configPath);
+
+    if (!file.is_open()) {
+        std::cerr << "FAILED TO OPEN CONFIG: " << configPath << std::endl;
+        return config;
+    }
+
+    std::string line;
+
+    while (std::getline(file, line)) {
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+
+        size_t pos = line.find(':');
+        if (pos == std::string::npos) {
+            continue;
+        }
+
+        std::string key = line.substr(0, pos);
+        std::string value = line.substr(pos + 1);
+
+        while (!value.empty() && value[0] == ' ') {
+            value.erase(0, 1);
+        }
+
+        config[key] = value;
+    }
+
+    return config;
+}
+
 int main() {
     std::string repoInput;
     std::string repoPath;
+    auto config = loadConfig("config.yaml");
+
+    if (config.empty()) {
+        std::cerr << "CONFIG NOT LOADED\n";
+        return 1;
+    }
+
+    std::cout << "CONFIG LOADED SUCCESSFULLY\n";
+    std::cout << "worktree_path: " << config["worktree_path"] << std::endl;
+    std::cout << "json_context_path: " << config["json_context_path"] << std::endl;
+    std::cout << "python_command: " << config["python_command"] << std::endl;
 
     std::cout << "ENTER REPOSITORY PATH OR GITHUB URL:\n";
     std::getline(std::cin, repoInput);
@@ -343,8 +400,6 @@ int main() {
         std::getline(std::cin, repoInput);
     }
 
-    // если ссылка GitHub -> clone
-    // если локальный путь -> просто используем его
     if (isGitHubUrl(repoInput)) {
         repoPath = cloneRepository(repoInput);
     }
@@ -356,10 +411,10 @@ int main() {
     std::string branchName;
 
     std::string worktreePath =
-        R"(C:\Users\katew\source\repos\LLM_feature)";
+        config["worktree_path"];
 
     std::string jsonOutputPath =
-        R"(C:\Users\katew\source\repos\LLM\python\project_context.json)";
+        config["json_context_path"];
 
     std::cout << "ENTER BASE BRANCH (example: main or master):\n";
     std::getline(std::cin, baseBranch);
@@ -470,40 +525,50 @@ int main() {
         std::string changedFilesRaw =
             runCommand(diffFilesCmd);
 
-        std::string changedFilesArg =
-            changedFilesRaw;
+        std::vector<std::string> changedFiles =
+            splitLines(changedFilesRaw);
 
-        std::replace(
-            changedFilesArg.begin(),
-            changedFilesArg.end(),
-            '\n',
-            ';'
-        );
+        std::string changedFilesArg;
 
-        std::replace(
-            changedFilesArg.begin(),
-            changedFilesArg.end(),
-            '\r',
-            ' '
-        );
+        for (const auto& file : changedFiles)
+        {
+            if (!isRelevantChangedFile(file))
+            {
+                continue;
+            }
+
+            if (!changedFilesArg.empty())
+            {
+                changedFilesArg += ";";
+            }
+
+            changedFilesArg += file;
+        }
 
         std::cout << "CURRENT BRANCH:\n"
             << currentBranch
             << "\n\n";
 
-        std::cout << "CHANGED FILES BETWEEN BRANCHES:\n"
-            << changedFilesRaw
-            << "\n";
+        std::cout << "CHANGED FILES BETWEEN BRANCHES:\n";
+
+        for (const auto& file : changedFiles)
+        {
+            std::cout << file << "\n";
+        }
+
+        std::cout << "\n";
 
         std::string pythonCmd =
-            "py C:\\Users\\katew\\source\\repos\\LLM\\python\\orchestrator.py "
-            "--path \"" + projectPath + "\" "
-            "--provider auto "
-            "--model deepseek-coder "
-            "--workers 4 "
+            config["python_command"] + " " +
+            "--path \"" + projectPath + "\" " +
+            "--provider auto " +
+            "--model deepseek-coder " +
+            "--workers 4 " +
             "--mode " + analysisMode +
             " --base-branch " + baseBranch +
-            " --json-context \"" + jsonOutputPath + "\" "
+            " --source-branch " + branchName +
+            " --target-branch " + baseBranch +
+            " --json-context \"" + jsonOutputPath + "\" " +
             "--changed-files \"" + changedFilesArg + "\"";
 
         if (forceReanalyze) {

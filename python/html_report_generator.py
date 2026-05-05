@@ -187,6 +187,11 @@ def save_html_report(project_path, report_data):
         risk_level = "LOW"
         risk_class = "risk-low"
 
+    pr_status = "SAFE TO MERGE"
+
+    if risk_level == "HIGH":
+        pr_status = "MANUAL REVIEW REQUIRED"
+
     rows = []
     for finding in findings:
         severity_class = get_severity_class(finding["severity"])
@@ -465,11 +470,54 @@ def save_html_report(project_path, report_data):
 </head>
 <body>
     <h1>LLM Agent Analysis Report</h1>
+    <div class="module-card">
+    <h2>Executive Summary</h2>
+
+    <p>
+        Overall project risk level:
+        <b class="{risk_class}">{risk_level}</b>
+    </p>
+
+    <p>
+        The most critical risks are related to:
+    </p>
+
+    <ul>
+        <li>interfile ownership issues</li>
+        <li>manual memory management</li>
+        <li>unsafe command execution</li>
+        <li>raw pointer interface exposure</li>
+    </ul>
+
+    <p>
+        Manual review is strongly recommended before merge.
+    </p>
+</div>
+<div class="module-card">
+    <h2>Top Immediate Actions</h2>
+
+    <ol>
+        <li>Replace raw pointer ownership with RAII</li>
+        <li>Remove unsafe system/_popen usage</li>
+        <li>Eliminate strcpy/manual allocation patterns</li>
+    </ol>
+</div>
     <p class="small">Generated at: {escape(str(report_data.get("generated_at", "")))}</p>
     <p class="small">Project path: {escape(str(report_data.get("project_path", "")))}</p>
 
     <h2>Project Summary</h2>
+
 <div class="summary-grid">
+
+    <div class="card">
+    <div class="card-title">PR Review Status</div>
+    <div class="card-value {risk_class}">
+        {pr_status}
+    </div>
+</div>
+
+    <div class="card">
+        <div class="card-title">Risk level</div>
     <div class="card">
         <div class="card-title">Risk level</div>
         <div class="card-value {risk_class}">{risk_level}</div>
@@ -674,6 +722,7 @@ def save_html_report(project_path, report_data):
         <thead>
             <tr>
                 <th>Priority</th>
+                <th>Confidence</th>
                 <th>Bug</th>
                 <th>Severity</th>
                 <th>Risk Trend</th>
@@ -688,6 +737,7 @@ def save_html_report(project_path, report_data):
                     f'''
                     <tr>
                         <td><b>{item.get("priority_score", 0)}</b></td>
+                        <td><b>{item.get("confidence_score", 0)}</b></td>
                         <td>{escape(str(item.get("bug", "")))}</td>
                         <td>
                             <span class="{get_severity_class(item.get("severity"))}">

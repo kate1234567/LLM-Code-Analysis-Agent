@@ -1,0 +1,21 @@
+project_root: C:/Users/katew/source/repos
+
+worktree_path: C:/Users/katew/source/repos/LLM_feature
+
+json_context_path: C:/Users/katew/source/repos/LLM/python/project_context.json
+
+reports_path: C:/Users/katew/source/repos/LLM/analysis_reports
+
+python_command: py C:/Users/katew/source/repos/LLM/python/orchestrator.py
+
+default_provider: auto
+
+default_model: deepseek-coder
+
+default_workers: 4
+
+default_base_branch: main
+
+default_source_branch: feature-test
+
+default_target_branch: main

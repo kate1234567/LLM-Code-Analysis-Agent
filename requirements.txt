@@ -1,0 +1,7 @@
+requests
+psycopg2-binary
+PyYAML
+networkx
+matplotlib
+libclang
+python-dotenv

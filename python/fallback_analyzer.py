@@ -88,32 +88,11 @@ def run_fallback_analysis(
             "severity": "high"
         },
         {
-            "pattern": r"password\s*=",
+            "pattern": r"(password|passwd|token|secret|api[_-]?key)\s*=\s*[\"'][^\"']+[\"']",
             "bug": "hardcoded-credentials",
-            "cause": "Credentials appear directly in code or command strings.",
+            "cause": "Credentials appear directly in code as hardcoded string literals.",
             "fix": "Move credentials to environment variables or protected configuration.",
             "severity": "high"
-        },
-        {
-            "pattern": r"git\s+-C",
-            "bug": "external-tool-dependency",
-            "cause": "Code depends on external command-line tools without explicit availability checks.",
-            "fix": "Check tool availability before execution and handle missing tools gracefully.",
-            "severity": "medium"
-        },
-        {
-            "pattern": r"\bpy\s+",
-            "bug": "external-tool-dependency",
-            "cause": "Code depends on external command-line tools without explicit availability checks.",
-            "fix": "Check tool availability before execution and handle missing tools gracefully.",
-            "severity": "medium"
-        },
-        {
-            "pattern": r"catch\s*\(\s*const\s+std::exception\s*&",
-            "bug": "weak-error-propagation",
-            "cause": "Errors may be logged but not propagated to caller as failure status.",
-            "fix": "Return a non-zero exit code or propagate failure state.",
-            "severity": "medium"
         },
         {
             "pattern": r"\bnew\s+",

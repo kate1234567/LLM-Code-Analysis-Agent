@@ -5,6 +5,7 @@ import json
 import argparse
 import hashlib
 from function_call_graph import build_function_call_graph
+from finding_validator import validate_finding
 from structural_graph_builder import build_structural_graph
 from svg_graph_generator import build_dependency_svg
 from clang_ast_analyzer import build_clang_ast_report
@@ -12,7 +13,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from context_selector import build_selected_context
 from module_subagent import run_module_subagents, save_module_report
-from final_report_generator import save_final_report
+from final_report_generator import (
+    save_final_report,
+    save_sarif_report
+)
 from project_scanner import scan_project, detect_language, is_deep_analysis_supported, get_language_summary
 from project_graph_builder import build_graph
 from json_context_loader import load_context_from_json
@@ -39,7 +43,11 @@ from db_writer import (
     load_file_analysis_cache
 )
 
-JSON_CONTEXT_PATH = r"C:\Users\katew\source\repos\LLM\python\project_context.json"
+from config_loader import load_config
+
+config = load_config()
+
+JSON_CONTEXT_PATH = config["json_context_path"]
 
 
 def normalize_changed_paths(project_path, changed_files, all_cpp_files):
@@ -93,21 +101,21 @@ def parse_args():
     parser.add_argument(
         "--provider",
         type=str,
-        default="ollama",
+        default=config["default_provider"],
         help="LLM provider: ollama / mock / openai"
     )
 
     parser.add_argument(
         "--model",
         type=str,
-        default="deepseek-coder",
+        default=config["default_model"],
         help="LLM model name"
     )
 
     parser.add_argument(
         "--workers",
         type=int,
-        default=4,
+        default=int(config["default_workers"]),
         help="Max parallel subagents"
     )
 
@@ -122,8 +130,22 @@ def parse_args():
     parser.add_argument(
         "--base-branch",
         type=str,
-        default="main",
+        default=config["default_base_branch"],
         help="Base branch for diff comparison"
+    )
+
+    parser.add_argument(
+        "--source-branch",
+        type=str,
+        default=config["default_source_branch"],
+        help="Source branch for PR analysis"
+    )
+
+    parser.add_argument(
+        "--target-branch",
+        type=str,
+        default=config["default_target_branch"],
+        help="Target branch for PR comparison"
     )
 
     parser.add_argument(
@@ -558,7 +580,17 @@ def process_code_file(
         parsed = result.get("result", {})
         bugs = deduplicate_bugs(parsed.get("bugs", []))
 
+        validated_bugs = []
+
         for bug in bugs:
+            bug = validate_finding(
+                bug,
+                ast_data=selected_context.get("clang_ast", {}),
+                graph_data={
+                    "reverse_dependencies_count": len(reverse_dependencies)
+                }
+            )
+
             score, reasons = calculate_priority_score(
                 bug,
                 target_file,
@@ -571,12 +603,14 @@ def process_code_file(
             bug["priority_reason"] = reasons
             bug["impact_radius"] = len(reverse_dependencies)
 
-        bugs.sort(
+            validated_bugs.append(bug)
+
+        validated_bugs.sort(
             key=lambda x: x.get("priority_score", 0),
             reverse=True
         )
 
-        parsed["bugs"] = bugs
+        parsed["bugs"] = validated_bugs
 
         source_type = classify_source_type(parsed)
 
@@ -1000,7 +1034,13 @@ def calculate_file_hash(file_path):
         print("HASH ERROR:", file_path, str(e))
         return None
 
-def run_project(project_path, changed_files=None, analysis_mode="full"):
+def run_project(
+    project_path,
+    changed_files=None,
+    analysis_mode="full",
+    source_branch=None,
+    target_branch=None
+):
     total_start = time.time()
     conn = get_connection()
 
@@ -1023,8 +1063,8 @@ def run_project(project_path, changed_files=None, analysis_mode="full"):
             project_id=project_id,
             pr_number=1,
             author="local-user",
-            source_branch="feature-test",
-            target_branch="master",
+            source_branch=source_branch,
+            target_branch=target_branch,
             status="open",
             conn=conn
         )
@@ -1426,10 +1466,16 @@ def run_project(project_path, changed_files=None, analysis_mode="full"):
         comparison = compare_reports(previous_report, report_data)
         report_data["comparison"] = comparison
         final_report_path = save_final_report(project_path, report_data)
+        sarif_report_path = save_sarif_report(project_path, report_data)
 
         report_path = save_run_report(project_path, report_data)
         summary_txt_path = save_run_summary_txt(project_path, report_data)
         html_report_path = save_html_report(project_path, report_data)
+
+        print(f"FINAL REPORT SAVED: {final_report_path}")
+        print(f"SARIF REPORT SAVED: {sarif_report_path}")
+        print(f"RUN REPORT SAVED: {report_path}")
+        print(f"HTML REPORT SAVED: {html_report_path}")
 
         save_log_metric(
             project_id,
@@ -1519,5 +1565,7 @@ if __name__ == "__main__":
     run_project(
         project_path,
         changed_files=changed_files,
-        analysis_mode=args.mode
+        analysis_mode=args.mode,
+        source_branch=args.source_branch,
+        target_branch=args.target_branch
     )

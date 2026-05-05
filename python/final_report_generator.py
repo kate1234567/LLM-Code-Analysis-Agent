@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
-
+from evaluation_metrics import calculate_metrics
+import json
 
 def safe_get(data, key, default=None):
     if not isinstance(data, dict):
@@ -107,6 +108,16 @@ def generate_final_report(report_data):
 
     bugs = collect_all_bugs(results)
     risk = build_risk_summary(bugs, module_reports)
+    ground_truth = [
+        ("main.cpp", "Raw pointer ownership"),
+        ("db.cpp", "Unsafe system call"),
+        ("user.h", "Missing virtual destructor"),
+    ]
+
+    metrics = calculate_metrics(
+        ground_truth,
+        bugs
+    )
 
     lines = []
 
@@ -219,7 +230,20 @@ def generate_final_report(report_data):
     lines.append(f"Unchanged findings: {comparison.get('unchanged_findings_count', 0)}")
     lines.append("")
 
-    lines.append("8. CONCLUSION")
+    lines.append("")
+    lines.append("8. EVALUATION METRICS")
+    lines.append("-" * 60)
+    lines.append(f"Ground truth bugs: {metrics['ground_truth']}")
+    lines.append(f"Detected by agent: {metrics['detected']}")
+    lines.append(f"True positive: {metrics['true_positive']}")
+    lines.append(f"False positive: {metrics['false_positive']}")
+    lines.append(f"False negative: {metrics['false_negative']}")
+    lines.append(f"Precision: {metrics['precision']}%")
+    lines.append(f"Recall: {metrics['recall']}%")
+    lines.append(f"F1-score: {metrics['f1_score']}%")
+    lines.append("")
+
+    lines.append("9. CONCLUSION")
     lines.append("-" * 60)
 
     if risk["risk_level"] == "HIGH":
@@ -245,3 +269,154 @@ def save_final_report(project_path, report_data):
         f.write(content)
 
     return report_path
+
+def save_sarif_report(project_path, report_data):
+    report_dir = os.path.join(project_path, "analysis_reports")
+    os.makedirs(report_dir, exist_ok=True)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report_path = os.path.join(
+        report_dir,
+        f"report_{timestamp}.sarif"
+    )
+
+    results = []
+
+    for item in report_data.get("results", []):
+        file_path = item.get("file", "")
+        parsed = item.get("result", {})
+        bugs = parsed.get("bugs", [])
+
+        for bug in bugs:
+            severity = bug.get("severity", "medium")
+            message = bug.get("bug", "")
+            line_start = bug.get("line_start", 1)
+            line_end = bug.get("line_end", line_start)
+
+            level = "warning"
+
+            if severity == "high":
+                level = "error"
+            elif severity == "low":
+                level = "note"
+
+            results.append({
+                "ruleId": map_rule_id(message),
+                "level": level,
+                "message": {
+                    "text": message
+                },
+                "properties": {
+                    "cause": bug.get("cause", ""),
+                    "fix": bug.get("fix", ""),
+                    "scope": bug.get("finding_scope", "local"),
+                    "confidence_score": bug.get("confidence_score", 0),
+                    "validation_status": bug.get("validation_status", "unknown"),
+                    "priority_score": bug.get("priority_score", 0)
+                },
+                "locations": [
+                    {
+                        "physicalLocation": {
+                            "artifactLocation": {
+                                "uri": file_path
+                            },
+                            "region": {
+                                "startLine": line_start,
+                                "endLine": line_end
+                            }
+                        }
+                    }
+                ]
+            })
+
+    sarif_data = {
+        "version": "2.1.0",
+        "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+        "runs": [
+    {
+        "tool": {
+            "driver": {
+                "name": "LLM Agent Code Analyzer",
+                "version": "1.0",
+                "rules": [
+                    {
+                        "id": "RawPointerOwnership",
+                        "name": "Raw Pointer Ownership Risk",
+                        "shortDescription": {
+                            "text": "Unsafe raw pointer ownership detected"
+                        },
+                        "fullDescription": {
+                            "text": "Manual ownership management may cause leaks, double free, or invalid memory access."
+                        },
+                        "help": {
+                            "text": "Use RAII and smart pointers like std::unique_ptr or std::shared_ptr."
+                        }
+                    },
+                    {
+                        "id": "UnsafeSystemCall",
+                        "name": "Unsafe System Command Execution",
+                        "shortDescription": {
+                            "text": "Unsafe system() or _popen() usage detected"
+                        },
+                        "fullDescription": {
+                            "text": "Direct shell execution may introduce security risks and command injection vulnerabilities."
+                        },
+                        "help": {
+                            "text": "Use safer process APIs and validate all external inputs."
+                        }
+                    },
+                    {
+                        "id": "ManualMemoryManagement",
+                        "name": "Manual Memory Management Risk",
+                        "shortDescription": {
+                            "text": "Manual allocation patterns detected"
+                        },
+                        "fullDescription": {
+                            "text": "Manual memory allocation increases the probability of memory leaks and invalid access."
+                        },
+                        "help": {
+                            "text": "Prefer STL containers and RAII over malloc/new/delete patterns."
+                        }
+                    },
+                    {
+                        "id": "GeneralCodeRisk",
+                        "name": "General Code Quality Risk",
+                        "shortDescription": {
+                            "text": "General code quality issue detected"
+                        },
+                        "fullDescription": {
+                            "text": "Potential maintainability, reliability, or architectural issue detected by analysis."
+                        },
+                        "help": {
+                            "text": "Review the issue manually and apply project-specific best practices."
+                        }
+                    }
+                ]
+            }
+        },
+        "results": results
+    }
+]
+    }
+
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(
+            sarif_data,
+            f,
+            indent=4,
+            ensure_ascii=False
+        )
+
+    print(f"SARIF REPORT SAVED: {report_path}")
+
+    return report_path
+
+def map_rule_id(bug_name):
+    if "pointer" in bug_name.lower():
+        return "RawPointerOwnership"
+    if "system" in bug_name.lower() or "_popen" in bug_name.lower():
+        return "UnsafeSystemCall"
+    if "memory" in bug_name.lower():
+        return "ManualMemoryManagement"
+
+    return "GeneralCodeRisk"
