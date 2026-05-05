@@ -1,16 +1,17 @@
 import uuid
 import json
 import psycopg2
+from config_loader import load_config
 
+config = load_config()
 
 DB_CONFIG = {
-    "dbname": "llm",
-    "user": "postgres",
-    "password": "postgres",
-    "host": "localhost",
-    "port": "5432"
+    "dbname": config["db_name"],
+    "user": config["db_user"],
+    "password": config["db_password"],
+    "host": config["db_host"],
+    "port": config["db_port"]
 }
-
 
 def get_connection():
     return psycopg2.connect(**DB_CONFIG)
