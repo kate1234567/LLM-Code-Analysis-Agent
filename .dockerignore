@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.vs/
+x64/
+Debug/
+Release/
+build/
+analysis_reports/
+.git/
+.gitignore
