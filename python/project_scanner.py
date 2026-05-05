@@ -10,14 +10,29 @@ SUPPORTED_EXTENSIONS = {
     ".c": "c",
     ".h": "cpp",
     ".hpp": "cpp",
+
     ".cs": "csharp",
     ".py": "python",
     ".js": "javascript",
     ".ts": "typescript",
     ".java": "java",
     ".go": "go",
+    ".sql": "sql",
+    ".php": "php",
+    ".rb": "ruby",
+    ".kt": "kotlin",
 }
 
+def is_deep_analysis_supported(file_path):
+    language = detect_language(file_path)
+    return language in {"cpp", "c"}
+
+
+def get_language_summary(scan_data):
+    return {
+        language: len(files)
+        for language, files in scan_data.get("files_by_language", {}).items()
+    }
 
 def detect_language(file_path):
     ext = os.path.splitext(file_path)[1].lower()

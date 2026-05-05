@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-from typing import Optional
+from typing import Optional, List
 
 
 class BaseLLMClient:
@@ -10,14 +10,9 @@ class BaseLLMClient:
 
 
 class OllamaClient(BaseLLMClient):
-    def __init__(
-        self,
-        model: str = "deepseek-coder",
-        url: str = "http://localhost:11434/api/generate",
-        timeout: int = 60
-    ):
+    def __init__(self, model: str = "deepseek-coder", timeout: int = 60):
         self.model = model
-        self.url = url
+        self.url = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
         self.timeout = timeout
 
         for k in ["HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"]:
@@ -43,17 +38,51 @@ class OllamaClient(BaseLLMClient):
             timeout=self.timeout
         )
 
-        print("\n=== LLM DEBUG ===")
-        print("PROVIDER: ollama")
-        print("STATUS:", response.status_code)
-        print("RAW:", response.text[:300])
-        print("=================\n")
-
         if response.status_code != 200:
             raise RuntimeError(f"Ollama error: status={response.status_code}")
 
         payload = response.json()
         return payload.get("response", "")
+
+
+class OpenAIClient(BaseLLMClient):
+    def __init__(self, model: str = "gpt-4.1-mini", api_key: Optional[str] = None, timeout: int = 60):
+        self.model = model
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.timeout = timeout
+
+        if not self.api_key:
+            raise RuntimeError("OPENAI_API_KEY is not set")
+
+    def generate(self, prompt: str) -> str:
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": self.model,
+                "temperature": 0,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a strict code review formatter. Return JSON only."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            },
+            timeout=self.timeout
+        )
+
+        if response.status_code != 200:
+            raise RuntimeError(f"OpenAI error: status={response.status_code}, body={response.text[:300]}")
+
+        payload = response.json()
+        return payload["choices"][0]["message"]["content"]
 
 
 class MockClient(BaseLLMClient):
@@ -63,43 +92,46 @@ class MockClient(BaseLLMClient):
         })
 
 
-class OpenAIClient(BaseLLMClient):
-    def __init__(self, model: str = "gpt-4.1-mini", api_key: Optional[str] = None):
-        self.model = model
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-
-        if not self.api_key:
-            raise RuntimeError("OPENAI_API_KEY is not set")
+class FallbackLLMClient(BaseLLMClient):
+    def __init__(self, clients: List[BaseLLMClient]):
+        self.clients = clients
 
     def generate(self, prompt: str) -> str:
-        raise NotImplementedError(
-            "OpenAIClient placeholder is ready, but API request is not implemented yet"
-        )
+        last_error = None
+
+        for client in self.clients:
+            try:
+                print("TRY LLM PROVIDER:", client.__class__.__name__)
+                return client.generate(prompt)
+            except Exception as e:
+                last_error = e
+                print("LLM PROVIDER FAILED:", client.__class__.__name__, str(e))
+
+        raise RuntimeError(f"All LLM providers failed: {last_error}")
 
 
-class QwenClient(BaseLLMClient):
-    def __init__(self, model: str = "qwen-code"):
-        self.model = model
-
-    def generate(self, prompt: str) -> str:
-        raise NotImplementedError(
-            "QwenClient placeholder is ready, but CLI/API request is not implemented yet"
-        )
-
-
-def create_llm_client(provider: str = "ollama", model: Optional[str] = None) -> BaseLLMClient:
-    provider = (provider or "ollama").lower()
+def create_llm_client(provider: str = "auto", model: Optional[str] = None) -> BaseLLMClient:
+    provider = (provider or "auto").lower()
 
     if provider == "ollama":
         return OllamaClient(model=model or "deepseek-coder")
 
-    if provider == "mock":
-        return MockClient()
-
     if provider == "openai":
         return OpenAIClient(model=model or "gpt-4.1-mini")
 
-    if provider == "qwen":
-        return QwenClient(model=model or "qwen-code")
+    if provider == "mock":
+        return MockClient()
+
+    if provider == "auto":
+        clients = []
+
+        clients.append(OllamaClient(model=model or "deepseek-coder"))
+
+        if os.getenv("OPENAI_API_KEY"):
+            clients.append(OpenAIClient(model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini")))
+
+        clients.append(MockClient())
+
+        return FallbackLLMClient(clients)
 
     raise ValueError(f"Unknown LLM provider: {provider}")

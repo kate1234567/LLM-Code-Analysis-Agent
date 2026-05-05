@@ -55,6 +55,102 @@ def get_or_create_project(name, repo_url="", description="", conn=None):
 
     return project_id
 
+def load_last_file_hash(project_id, file_path, conn):
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT metadata->>'file_hash'
+                FROM projectcontext
+                WHERE project_id = %s
+                  AND context_type = 'file_hash_cache'
+                  AND metadata->>'file' = %s
+                ORDER BY created_at DESC
+                LIMIT 1
+            """, (str(project_id), file_path))
+
+            row = cur.fetchone()
+
+            if row and row[0]:
+                return row[0]
+
+            return None
+
+    except Exception as e:
+        print("LOAD HASH ERROR:", str(e))
+        return None
+
+def save_file_analysis_cache(project_id, file_path, file_hash, result_data, conn):
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO analysis_cache (
+                    project_id,
+                    file_path,
+                    cache_type,
+                    content,
+                    metadata,
+                    content_hash
+                )
+                VALUES (%s, %s, %s, %s, %s, %s)
+                ON CONFLICT (
+                    project_id,
+                    file_path,
+                    cache_type,
+                    content_hash
+                )
+                DO UPDATE SET
+                    metadata = EXCLUDED.metadata,
+                    updated_at = NOW()
+            """, (
+                str(project_id),
+                file_path,
+                "file_analysis",
+                f"Analysis cache for {file_path}",
+                json.dumps(result_data),
+                file_hash
+            ))
+
+        conn.commit()
+
+    except Exception as e:
+        print("SAVE ANALYSIS CACHE ERROR:", str(e))
+        conn.rollback()
+
+def load_file_analysis_cache(project_id, file_path, file_hash, conn):
+    try:
+        with conn.cursor() as cur:
+            print("CACHE SEARCH:")
+            print("PROJECT ID:", project_id)
+            print("FILE PATH:", file_path)
+            print("FILE HASH:", file_hash)
+
+            cur.execute("""
+                SELECT metadata
+                FROM analysis_cache
+                WHERE project_id = %s
+                  AND file_path = %s
+                  AND cache_type = %s
+                  AND content_hash = %s
+                LIMIT 1
+            """, (
+                str(project_id),
+                file_path,
+                "file_analysis",
+                file_hash
+            ))
+
+            row = cur.fetchone()
+
+            print("CACHE ROW:", row)
+
+            if not row:
+                return None
+
+            return row[0]
+
+    except Exception as e:
+        print("LOAD ANALYSIS CACHE ERROR:", str(e))
+        return None
 
 def create_pull_request(project_id, pr_number, author, source_branch, target_branch, status="open", conn=None):
     own_conn = conn is None

@@ -30,6 +30,45 @@ def collect_all_bugs(results):
 
     return bugs
 
+def build_bug_signature(bug):
+    return (
+        bug.get("file", ""),
+        bug.get("bug", ""),
+        bug.get("line_start", 0),
+        bug.get("line_end", 0),
+        bug.get("severity", ""),
+        bug.get("finding_scope", "")
+    )
+
+def compare_with_previous_run(current_results, previous_results):
+    current_signatures = set()
+    previous_signatures = set()
+
+    for item in current_results:
+        result = item.get("result", {})
+        file_path = item.get("file", "")
+
+        for bug in result.get("bugs", []):
+            bug["file"] = file_path
+            current_signatures.add(build_bug_signature(bug))
+
+    for item in previous_results:
+        result = item.get("result", {})
+        file_path = item.get("file", "")
+
+        for bug in result.get("bugs", []):
+            bug["file"] = file_path
+            previous_signatures.add(build_bug_signature(bug))
+
+    new_findings = current_signatures - previous_signatures
+    resolved_findings = previous_signatures - current_signatures
+    unchanged_findings = current_signatures & previous_signatures
+
+    return {
+        "new_findings_count": len(new_findings),
+        "resolved_findings_count": len(resolved_findings),
+        "unchanged_findings_count": len(unchanged_findings)
+    }
 
 def build_risk_summary(bugs, module_reports):
     high = sum(1 for b in bugs if b.get("severity") == "high")

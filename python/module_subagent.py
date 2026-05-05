@@ -19,9 +19,29 @@ def normalize_severity(severity):
 
     return severity
 
+def get_bug_name(bug):
+    return (bug.get("bug") or bug.get("finding_type") or "").strip()
+
+
+def get_bug_scope(bug):
+    return (bug.get("finding_scope") or "local").strip().lower()
+
+
+def is_header_file(file_path):
+    return file_path.lower().endswith((".h", ".hpp"))
+
+
+def is_cpp_file(file_path):
+    return file_path.lower().endswith((".cpp", ".cxx", ".cc", ".c"))
 
 def build_module_summary(module_name, module_results):
     architecture_findings = []
+
+    header_files = set()
+    cpp_files = set()
+    cache_files = 0
+    llm_files = 0
+    fallback_files = 0
 
     interfile_bugs = []
     raw_pointer_files = set()
@@ -33,9 +53,23 @@ def build_module_summary(module_name, module_results):
         parsed = item.get("result", {})
         bugs = parsed.get("bugs", [])
 
+        if is_header_file(file_path):
+            header_files.add(file_path)
+
+        if is_cpp_file(file_path):
+            cpp_files.add(file_path)
+
+        source_type = item.get("source_type", "")
+        if source_type == "cache":
+            cache_files += 1
+        elif source_type == "llm":
+            llm_files += 1
+        elif source_type == "fallback":
+            fallback_files += 1
+
         for bug in bugs:
-            bug_name = bug.get("bug", "")
-            scope = bug.get("finding_scope", "local")
+            bug_name = get_bug_name(bug)
+            scope = get_bug_scope(bug)
             severity = normalize_severity(bug.get("severity"))
 
             if scope == "interfile":
@@ -88,12 +122,76 @@ def build_module_summary(module_name, module_results):
             "severity": "high"
         })
 
+    if len(header_files) >= 1 and len(cpp_files) >= 2:
+        architecture_findings.append({
+            "problem": "Shared header is used by several implementation files",
+            "cause": "The module contains header files connected with several implementation files, so interface changes may affect multiple files.",
+            "files": sorted(header_files | cpp_files),
+            "severity": "medium"
+        })
+
+    if cache_files == len(module_results) and module_results:
+        architecture_findings.append({
+            "problem": "Module analysis was fully restored from cache",
+            "cause": "All files in this module were skipped by hash cache, which shows that repeated analysis avoids unnecessary LLM calls.",
+            "files": sorted([item.get("file", "") for item in module_results]),
+            "severity": "low"
+        })
+
+    interfile_findings_count = len(interfile_bugs)
+
+    high_severity_count = 0
+    reverse_dependencies_count = 0
+
+    interfile_findings_count = len(interfile_bugs)
+
+    cross_module_risk_score = (
+            interfile_findings_count * 3
+            + high_severity_count * 2
+            + reverse_dependencies_count
+    )
+
+    for item in module_results:
+        parsed = item.get("result", {})
+        bugs = parsed.get("bugs", [])
+
+        reverse_dependencies_count += item.get(
+            "reverse_dependencies_count",
+            0
+        )
+
+        for bug in bugs:
+            severity = normalize_severity(
+                bug.get("severity")
+            )
+
+            if severity == "high":
+                high_severity_count += 1
+
+    cross_module_risk_score = calculate_cross_module_risk_score(
+        interfile_findings_count,
+        high_severity_count,
+        reverse_dependencies_count
+    )
+
     return {
         "module": module_name,
         "files_count": len(module_results),
+        "header_files_count": len(header_files),
+        "cpp_files_count": len(cpp_files),
+        "cache_files_count": cache_files,
+        "llm_files_count": llm_files,
+        "fallback_files_count": fallback_files,
+
+        "interfile_findings_count": interfile_findings_count,
+        "high_severity_count": high_severity_count,
+        "reverse_dependencies_count": reverse_dependencies_count,
+        "cross_module_risk_score": cross_module_risk_score,
+        "cross_module_risk_score": cross_module_risk_score,
+        "reverse_dependencies_count": reverse_dependencies_count,
+
         "architecture_findings": architecture_findings
     }
-
 
 def run_module_subagents(results):
     modules = defaultdict(list)
@@ -115,6 +213,16 @@ def run_module_subagents(results):
 
     return module_reports
 
+def calculate_cross_module_risk_score(
+    interfile_findings_count,
+    high_severity_count,
+    reverse_dependencies_count
+):
+    return (
+        interfile_findings_count * 3
+        + high_severity_count * 2
+        + reverse_dependencies_count
+    )
 
 def save_module_report(project_path, module_reports):
     import os

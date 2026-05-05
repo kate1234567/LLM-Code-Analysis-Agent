@@ -323,6 +323,56 @@ def deduplicate_bugs(bugs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
     return list(best_by_key.values())
 
+def enrich_priority_scores(
+    bugs: List[Dict[str, Any]],
+    historical_findings: Optional[List[Dict[str, Any]]] = None,
+    reverse_dependencies: Optional[List[Dict[str, Any]]] = None,
+) -> List[Dict[str, Any]]:
+
+    history_count = len(historical_findings or [])
+    reverse_count = len(reverse_dependencies or [])
+
+    for bug in bugs:
+        score = 0
+        reasons = []
+
+        severity = normalize_severity(
+            bug.get("severity", "medium")
+        )
+
+        if severity == "high":
+            score += 40
+            reasons.append("high severity")
+        elif severity == "medium":
+            score += 20
+            reasons.append("medium severity")
+        else:
+            score += 10
+            reasons.append("low severity")
+
+        scope = normalize_scope(
+            bug.get("finding_scope", "local")
+        )
+
+        if scope == "interfile":
+            score += 30
+            reasons.append("interfile issue")
+        else:
+            score += 10
+            reasons.append("local issue")
+
+        if history_count > 0:
+            score += min(history_count * 5, 20)
+            reasons.append("historical issue")
+
+        if reverse_count > 0:
+            score += min(reverse_count * 5, 20)
+            reasons.append("has reverse dependencies")
+
+        bug["priority_score"] = score
+        bug["priority_reason"] = reasons
+
+    return bugs
 
 def limit_candidate_bugs(candidate_bugs: List[Dict[str, Any]], max_bugs: int = 5) -> List[Dict[str, Any]]:
     def sort_key(bug: Dict[str, Any]):
@@ -863,7 +913,15 @@ def run_subagent(
     )
 
     sanitized = sanitize_fallback_result(file_path, file_code, fallback_raw)
-    candidate_bugs = deduplicate_bugs(sanitized.get("bugs", []))
+    candidate_bugs = deduplicate_bugs(
+        sanitized.get("bugs", [])
+    )
+
+    candidate_bugs = enrich_priority_scores(
+        candidate_bugs,
+        historical_findings=historical_findings,
+        reverse_dependencies=reverse_dependencies
+    )
 
     rewrite_result = try_llm_rewrite(
         file_path=file_path,

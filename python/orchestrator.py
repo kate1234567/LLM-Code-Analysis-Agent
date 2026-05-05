@@ -2,16 +2,27 @@ import os
 import sys
 import time
 import json
+import argparse
+import hashlib
+from function_call_graph import build_function_call_graph
+from structural_graph_builder import build_structural_graph
+from svg_graph_generator import build_dependency_svg
+from clang_ast_analyzer import build_clang_ast_report
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from context_selector import build_selected_context
 from module_subagent import run_module_subagents, save_module_report
 from final_report_generator import save_final_report
-from project_scanner import scan_project
+from project_scanner import scan_project, detect_language, is_deep_analysis_supported, get_language_summary
 from project_graph_builder import build_graph
 from json_context_loader import load_context_from_json
 from html_report_generator import save_html_report
 from subagent_runner import run_subagent
+from class_subagent import (
+    run_class_subagents,
+    save_class_report
+)
+from fallback_analyzer import detect_lightweight_findings
 from db_writer import (
     get_connection,
     get_or_create_project,
@@ -22,7 +33,10 @@ from db_writer import (
     save_log_metric,
     create_subagent_task,
     update_subagent_task,
-    load_recent_findings_for_file
+    load_recent_findings_for_file,
+    load_last_file_hash,
+    save_file_analysis_cache,
+    load_file_analysis_cache
 )
 
 JSON_CONTEXT_PATH = r"C:\Users\katew\source\repos\LLM\python\project_context.json"
@@ -59,6 +73,106 @@ def normalize_changed_headers(project_path, changed_files, all_header_files):
 
     return selected
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="LLM Agent for Project-Level Code Analysis"
+    )
+
+    parser.add_argument(
+        "--path",
+        type=str,
+        help="Local project path for analysis"
+    )
+
+    parser.add_argument(
+        "--repo",
+        type=str,
+        help="Git repository URL for clone + analysis"
+    )
+
+    parser.add_argument(
+        "--provider",
+        type=str,
+        default="ollama",
+        help="LLM provider: ollama / mock / openai"
+    )
+
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="deepseek-coder",
+        help="LLM model name"
+    )
+
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=4,
+        help="Max parallel subagents"
+    )
+
+    parser.add_argument(
+        "--mode",
+        type=str,
+        default="full",
+        choices=["fast", "full"],
+        help="Analysis mode"
+    )
+
+    parser.add_argument(
+        "--base-branch",
+        type=str,
+        default="main",
+        help="Base branch for diff comparison"
+    )
+
+    parser.add_argument(
+        "--json-context",
+        type=str,
+        default=JSON_CONTEXT_PATH,
+        help="Path to exported project_context.json"
+    )
+
+    parser.add_argument(
+        "--changed-files",
+        type=str,
+        default="",
+        help="Changed files from git diff separated by ;"
+    )
+
+    parser.add_argument(
+        "--force-reanalyze",
+        action="store_true",
+        help="Ignore cache and force full re-analysis"
+    )
+
+    return parser.parse_args()
+
+def clone_repository(repo_url):
+    base_dir = os.path.join(os.getcwd(), "cloned_repos")
+    os.makedirs(base_dir, exist_ok=True)
+
+    repo_name = repo_url.rstrip("/").split("/")[-1].replace(".git", "")
+    target_path = os.path.join(base_dir, repo_name)
+
+    if os.path.exists(target_path):
+        print("REPOSITORY ALREADY EXISTS:")
+        print(target_path)
+        return target_path
+
+    print("CLONING REPOSITORY...")
+    print(repo_url)
+
+    command = f'git clone "{repo_url}" "{target_path}"'
+    exit_code = os.system(command)
+
+    if exit_code != 0:
+        raise Exception("Git clone failed")
+
+    print("CLONED TO:")
+    print(target_path)
+
+    return target_path
 
 def find_impacted_cpp_files_by_headers(changed_header_files, graph, all_cpp_files):
     impacted = set()
@@ -138,8 +252,59 @@ def classify_source_type(parsed):
         return "llm"
     return "fallback"
 
+def calculate_priority_score(
+    bug,
+    target_file,
+    changed_files,
+    historical_findings,
+    reverse_dependencies
+):
+    score = 0
+    reasons = []
 
-def process_code_file(project_id, pr_id, target_file, context_map, graph):
+    severity = (bug.get("severity") or "").lower()
+    scope = (bug.get("finding_scope") or "local").lower()
+
+    if severity == "high":
+        score += 50
+        reasons.append("high severity")
+    elif severity == "medium":
+        score += 30
+        reasons.append("medium severity")
+    elif severity == "low":
+        score += 10
+        reasons.append("low severity")
+
+    if scope == "interfile":
+        score += 30
+        reasons.append("interfile issue")
+    else:
+        score += 10
+        reasons.append("local issue")
+
+    if target_file in changed_files:
+        score += 20
+        reasons.append("changed file")
+
+    if historical_findings:
+        score += 15
+        reasons.append("historical issue")
+
+    if reverse_dependencies:
+        score += 10
+        reasons.append("has reverse dependencies")
+
+    return score, reasons
+
+def process_code_file(
+    project_id,
+    pr_id,
+    target_file,
+    context_map,
+    graph,
+    changed_files,
+    force_reanalyze=False
+):
     conn = get_connection()
     task_id = None
     has_paired_header = False
@@ -147,6 +312,162 @@ def process_code_file(project_id, pr_id, target_file, context_map, graph):
 
     try:
         print("ANALYZING:", target_file)
+
+        detected_language = detect_language(target_file)
+
+        if not is_deep_analysis_supported(target_file):
+            print("LIGHTWEIGHT ANALYSIS MODE:", target_file)
+            print("LANGUAGE:", detected_language)
+
+            try:
+                with open(target_file, "r", encoding="utf-8", errors="ignore") as f:
+                    file_code = f.read()
+
+                lightweight_result = detect_lightweight_findings(
+                    file_path=target_file,
+                    file_code=file_code,
+                    language=detected_language
+                )
+
+                parsed = {
+                    "bugs": lightweight_result,
+                    "llm_rewrite_used": False,
+                    "fallback_used": True,
+                    "fallback_reason": "lightweight_language_analysis"
+                }
+
+                saved_findings = []
+                saved_recommendations = []
+
+                for bug in parsed["bugs"]:
+                    finding_id = save_finding(
+                        pr_id,
+                        target_file,
+                        bug,
+                        source_type="lightweight",
+                        conn=conn
+                    )
+
+                    recommendation_id = save_recommendation(
+                        finding_id,
+                        bug,
+                        conn=conn
+                    )
+
+                    saved_findings.append(finding_id)
+                    saved_recommendations.append(recommendation_id)
+
+                print("LIGHTWEIGHT FINDINGS:", len(parsed["bugs"]))
+
+                return {
+                    "file": target_file,
+                    "task_id": None,
+                    "result": parsed,
+                    "finding_ids": saved_findings,
+                    "recommendation_ids": saved_recommendations,
+                    "source_type": "lightweight",
+                    "has_paired_header": False,
+                    "has_related_cpp": False,
+                    "reverse_dependencies_count": 0,
+                    "project_summary": {}
+                }
+
+            except Exception as e:
+                print("LIGHTWEIGHT ANALYSIS FAILED:", str(e))
+
+                return {
+                    "file": target_file,
+                    "error": str(e),
+                    "source_type": "lightweight_error",
+                    "has_paired_header": False,
+                    "has_related_cpp": False
+                }
+
+        current_hash = calculate_file_hash(target_file)
+
+        old_hash = load_last_file_hash(
+            project_id,
+            target_file,
+            conn
+        )
+
+        print("FORCE REANALYZE:", force_reanalyze)
+        print("CURRENT HASH:", current_hash)
+        print("OLD HASH:", old_hash)
+
+        if (
+                not force_reanalyze
+                and old_hash
+                and current_hash == old_hash
+        ):
+            cached_result = load_file_analysis_cache(
+                project_id,
+                target_file,
+                current_hash,
+                conn
+            )
+
+            if cached_result:
+                print("SKIPPED BY HASH CACHE:", target_file)
+                print("LOADED CACHED BUGS:", len(cached_result.get("bugs", [])))
+
+                selected_context = build_selected_context(
+                    target_file=target_file,
+                    context_map=context_map,
+                    graph=graph
+                )
+
+                paired_header = selected_context.get("paired_header", {})
+                related_cpp = selected_context.get("related_cpp", {})
+                reverse_dependencies = selected_context.get("reverse_dependencies", [])
+                project_summary = selected_context.get("project_summary", {})
+
+                has_paired_header = bool(paired_header and paired_header.get("path"))
+                has_related_cpp = bool(related_cpp and related_cpp.get("path"))
+
+                cached_bugs = deduplicate_bugs(
+                    cached_result.get("bugs", [])
+                )
+
+                saved_findings = []
+                saved_recommendations = []
+
+                for bug in cached_bugs:
+                    finding_id = save_finding(
+                        pr_id,
+                        target_file,
+                        bug,
+                        source_type="cache",
+                        conn=conn
+                    )
+
+                    print("SAVED CACHED FINDING:", finding_id)
+
+                    recommendation_id = save_recommendation(
+                        finding_id,
+                        bug,
+                        conn=conn
+                    )
+
+                    print("SAVED CACHED RECOMMENDATION:", recommendation_id)
+
+                    saved_findings.append(finding_id)
+                    saved_recommendations.append(recommendation_id)
+
+                return {
+                    "file": target_file,
+                    "task_id": None,
+                    "result": cached_result,
+                    "finding_ids": saved_findings,
+                    "recommendation_ids": saved_recommendations,
+                    "source_type": "cache",
+                    "has_paired_header": has_paired_header,
+                    "has_related_cpp": has_related_cpp,
+                    "reverse_dependencies_count": len(reverse_dependencies),
+                    "project_summary": project_summary
+                }
+
+            print("HASH FOUND, BUT ANALYSIS CACHE IS EMPTY. REANALYZING:", target_file)
 
         task_id = create_subagent_task(pr_id, target_file, status="running", conn=conn)
         print("CREATED SUBAGENT TASK:", task_id)
@@ -236,6 +557,25 @@ def process_code_file(project_id, pr_id, target_file, context_map, graph):
 
         parsed = result.get("result", {})
         bugs = deduplicate_bugs(parsed.get("bugs", []))
+
+        for bug in bugs:
+            score, reasons = calculate_priority_score(
+                bug,
+                target_file,
+                changed_files,
+                historical_findings,
+                reverse_dependencies
+            )
+
+            bug["priority_score"] = score
+            bug["priority_reason"] = reasons
+            bug["impact_radius"] = len(reverse_dependencies)
+
+        bugs.sort(
+            key=lambda x: x.get("priority_score", 0),
+            reverse=True
+        )
+
         parsed["bugs"] = bugs
 
         source_type = classify_source_type(parsed)
@@ -266,6 +606,15 @@ def process_code_file(project_id, pr_id, target_file, context_map, graph):
 
             saved_findings.append(finding_id)
             saved_recommendations.append(recommendation_id)
+
+        save_file_analysis_cache(
+            project_id=project_id,
+            file_path=target_file,
+            file_hash=current_hash,
+            result_data=parsed,
+            conn=conn
+        )
+
 
         return {
             "file": target_file,
@@ -377,6 +726,66 @@ def is_comparable_bug(bug):
 
     return True
 
+def compare_bug_details(previous_bug, current_bug):
+    changes = []
+    severity_rank = {
+        "low": 1,
+        "medium": 2,
+        "high": 3
+        }
+
+    old_severity = (previous_bug.get("severity") or "").lower()
+    new_severity = (current_bug.get("severity") or "").lower()
+
+    old_sev_rank = severity_rank.get(old_severity, 0)
+    new_sev_rank = severity_rank.get(new_severity, 0)
+
+    if new_sev_rank > old_sev_rank:
+        changes.append("severity increased")
+
+    elif new_sev_rank < old_sev_rank:
+        changes.append("severity decreased")
+
+    old_scope = (previous_bug.get("finding_scope") or "local").lower()
+    new_scope = (current_bug.get("finding_scope") or "local").lower()
+
+    if old_scope != new_scope:
+        if new_scope == "interfile":
+            changes.append("became interfile")
+        else:
+            changes.append("became local")
+
+    old_priority = previous_bug.get("priority_score", 0)
+    new_priority = current_bug.get("priority_score", 0)
+
+    if new_priority > old_priority:
+        changes.append("priority increased")
+
+    elif new_priority < old_priority:
+        changes.append("priority decreased")
+
+    return changes
+
+def calculate_risk_trend(changes):
+    growing_keywords = {
+        "severity increased",
+        "priority increased",
+        "became interfile"
+    }
+
+    improving_keywords = {
+        "severity decreased",
+        "priority decreased",
+        "became local"
+    }
+
+    if any(change in growing_keywords for change in changes):
+        return "GROWING"
+
+    if any(change in improving_keywords for change in changes):
+        return "IMPROVING"
+
+    return "STABLE"
 
 def compare_reports(previous_report, current_report):
     if not previous_report:
@@ -402,13 +811,15 @@ def compare_reports(previous_report, current_report):
                 continue
 
             sig = make_bug_signature(file_path, bug)
+
             prev_map[sig] = {
                 "file": file_path,
                 "bug": bug.get("bug"),
                 "severity": bug.get("severity"),
                 "line_start": bug.get("line_start"),
                 "line_end": bug.get("line_end"),
-                "finding_scope": bug.get("finding_scope")
+                "finding_scope": bug.get("finding_scope"),
+                "priority_score": bug.get("priority_score", 0)
             }
 
     for item in current_report.get("results", []):
@@ -420,13 +831,15 @@ def compare_reports(previous_report, current_report):
                 continue
 
             sig = make_bug_signature(file_path, bug)
+
             curr_map[sig] = {
                 "file": file_path,
                 "bug": bug.get("bug"),
                 "severity": bug.get("severity"),
                 "line_start": bug.get("line_start"),
                 "line_end": bug.get("line_end"),
-                "finding_scope": bug.get("finding_scope")
+                "finding_scope": bug.get("finding_scope"),
+                "priority_score": bug.get("priority_score", 0)
             }
 
     prev_keys = set(prev_map.keys())
@@ -436,6 +849,28 @@ def compare_reports(previous_report, current_report):
     resolved_keys = sorted(prev_keys - curr_keys)
     unchanged_keys = sorted(curr_keys & prev_keys)
 
+    unchanged_findings = []
+
+    for k in unchanged_keys:
+        previous_bug = prev_map[k]
+        current_bug = curr_map[k]
+
+        changes = compare_bug_details(
+            previous_bug,
+            current_bug
+        )
+
+        unchanged_findings.append({
+            "file": current_bug["file"],
+            "bug": current_bug["bug"],
+            "severity": current_bug["severity"],
+            "line_start": current_bug["line_start"],
+            "line_end": current_bug["line_end"],
+            "finding_scope": current_bug["finding_scope"],
+            "changes": changes,
+            "risk_trend": calculate_risk_trend(changes)
+        })
+
     return {
         "previous_report_path": previous_report.get("_report_path"),
         "new_findings_count": len(new_keys),
@@ -443,7 +878,7 @@ def compare_reports(previous_report, current_report):
         "unchanged_findings_count": len(unchanged_keys),
         "new_findings": [curr_map[k] for k in new_keys],
         "resolved_findings": [prev_map[k] for k in resolved_keys],
-        "unchanged_findings": [curr_map[k] for k in unchanged_keys]
+        "unchanged_findings": unchanged_findings
     }
 
 
@@ -491,6 +926,33 @@ def save_run_summary_txt(project_path, report_data):
     lines.append(f"Unchanged findings: {comparison.get('unchanged_findings_count', 0)}")
     lines.append("")
 
+    lines.append("UNCHANGED FINDINGS WITH CHANGES")
+    lines.append("-" * 30)
+
+    for item in comparison.get("unchanged_findings", []):
+        lines.append(f"File: {item.get('file')}")
+        lines.append(f"Bug: {item.get('bug')}")
+        lines.append(
+            f"Lines: {item.get('line_start')}-{item.get('line_end')}"
+        )
+        lines.append(
+            f"Scope: {item.get('finding_scope')}"
+        )
+        lines.append(
+            f"Severity: {item.get('severity')}"
+        )
+
+        changes = item.get("changes", [])
+
+        if changes:
+            lines.append("Changes:")
+            for change in changes:
+                lines.append(f"  - {change}")
+        else:
+            lines.append("Changes: none")
+
+        lines.append("")
+
     lines.append("FILES")
     lines.append("-" * 20)
 
@@ -521,8 +983,24 @@ def save_run_summary_txt(project_path, report_data):
 
     return report_path
 
+def calculate_file_hash(file_path):
+    sha = hashlib.sha256()
 
-def run_project(project_path, changed_files=None):
+    try:
+        with open(file_path, "rb") as f:
+            while True:
+                chunk = f.read(8192)
+                if not chunk:
+                    break
+                sha.update(chunk)
+
+        return sha.hexdigest()
+
+    except Exception as e:
+        print("HASH ERROR:", file_path, str(e))
+        return None
+
+def run_project(project_path, changed_files=None, analysis_mode="full"):
     total_start = time.time()
     conn = get_connection()
 
@@ -530,12 +1008,17 @@ def run_project(project_path, changed_files=None):
         project_name = os.path.basename(project_path.rstrip("\\/"))
 
         print("\n[0] CREATING PROJECT / PR...")
+
         project_id = get_or_create_project(
             name=project_name,
             repo_url=project_path,
             description="Local static analysis project",
             conn=conn
         )
+
+        print("PROJECT NAME:", project_name)
+        print("PROJECT ID:", project_id)
+
         pr_id = create_pull_request(
             project_id=project_id,
             pr_number=1,
@@ -546,7 +1029,6 @@ def run_project(project_path, changed_files=None):
             conn=conn
         )
 
-        print("PROJECT ID:", project_id)
         print("PR ID:", pr_id)
 
         save_log_metric(project_id, pr_id, "orchestrator", "start", {
@@ -558,6 +1040,32 @@ def run_project(project_path, changed_files=None):
         scan_start = time.time()
         data = scan_project(project_path)
         scan_duration = int((time.time() - scan_start) * 1000)
+
+        language_summary = get_language_summary(data)
+
+        print("\nSUPPORTED LANGUAGES DETECTED:")
+        for language, count in language_summary.items():
+            print(f" - {language}: {count}")
+
+        deep_supported_files = [
+            f for f in data["code_files"]
+            if is_deep_analysis_supported(f)
+        ]
+
+        lightweight_supported_files = [
+            f for f in data["code_files"]
+            if not is_deep_analysis_supported(f)
+        ]
+
+        routing_only_files = []
+
+        print("\nDEEP ANALYSIS FILES:")
+        for f in deep_supported_files:
+            print(" -", f)
+
+        print("\nROUTING-ONLY FILES:")
+        for f in routing_only_files:
+            print(" -", f)
 
         save_log_metric(project_id, pr_id, "scanner", "finish", {
             "code_files_count": len(data["code_files"]),
@@ -573,6 +1081,7 @@ def run_project(project_path, changed_files=None):
         print("\n[2] BUILDING GRAPH...")
         graph_start = time.time()
         graph = build_graph(project_path)
+        dependency_graph_svg = build_dependency_svg(graph)
         graph_duration = int((time.time() - graph_start) * 1000)
 
         save_project_context(
@@ -593,6 +1102,50 @@ def run_project(project_path, changed_files=None):
         raw_json_text = load_raw_json_text(JSON_CONTEXT_PATH)
         raw_json_data = json.loads(raw_json_text)
         context_map = load_context_from_json(JSON_CONTEXT_PATH)
+
+        function_graph = build_function_call_graph(context_map)
+
+        clang_ast_report = build_clang_ast_report(deep_supported_files)
+
+        structural_graph = build_structural_graph(
+            clang_ast_report,
+            graph,
+            function_graph
+        )
+
+        save_project_context(
+            project_id=project_id,
+            context_type="structural_graph",
+            content="MCP-like structural project graph",
+            metadata=structural_graph,
+            conn=conn
+        )
+
+        print("\nSTRUCTURAL GRAPH BUILT:")
+        print("STRUCTURAL NODES:", structural_graph.get("nodes_count", 0))
+        print("STRUCTURAL EDGES:", structural_graph.get("edges_count", 0))
+
+        save_project_context(
+            project_id=project_id,
+            context_type="clang_ast_report",
+            content="Clang AST structural report",
+            metadata=clang_ast_report,
+            conn=conn
+        )
+
+        print("\nCLANG AST REPORT BUILT:")
+        print("FILES WITH AST:", len(clang_ast_report))
+
+        save_project_context(
+            project_id=project_id,
+            context_type="function_call_graph",
+            content="Function call graph",
+            metadata=function_graph,
+            conn=conn
+        )
+
+        print("\nFUNCTION CALL GRAPH BUILT:")
+        print("FILES WITH FUNCTIONS:", len(function_graph))
 
         context_duration = int((time.time() - context_start) * 1000)
 
@@ -629,9 +1182,20 @@ def run_project(project_path, changed_files=None):
 
         analysis_files = []
 
-        if changed_files:
-            changed_code_files = normalize_changed_paths(project_path, changed_files, data["code_files"])
-            changed_header_files = normalize_changed_headers(project_path, changed_files, data["header_files"])
+        if analysis_mode == "fast" and changed_files:
+            print("\nFAST MODE: analyzing only changed + impacted files")
+
+            changed_code_files = normalize_changed_paths(
+                project_path,
+                changed_files,
+                data["code_files"]
+            )
+
+            changed_header_files = normalize_changed_headers(
+                project_path,
+                changed_files,
+                data["header_files"]
+            )
 
             impacted_cpp_files = find_impacted_cpp_files_by_headers(
                 changed_header_files,
@@ -645,31 +1209,19 @@ def run_project(project_path, changed_files=None):
                 impacted_cpp_files
             )
 
-            print("\nCHANGED CODE FILES FOR ANALYSIS:")
-            for f in changed_code_files:
-                print(" -", f)
-
-            print("\nCHANGED HEADER FILES:")
-            for h in changed_header_files:
-                print(" -", h)
-
-            print("\nIMPACTED CPP FILES FROM HEADER CHANGES:")
-            for f in impacted_cpp_files:
-                print(" -", f)
-
-            print("\nFINAL ANALYSIS FILES:")
+            print("\nFINAL ANALYSIS FILES (FAST MODE):")
             for f in analysis_files:
                 print(" -", f)
 
-            print("\nCHANGED HEADER FILES:")
-            for h in changed_header_files:
-                print(" -", h)
 
-            print("\nIMPACTED CPP FILES FROM HEADER CHANGES:")
-            for f in impacted_cpp_files:
-                print(" -", f)
+        else:
 
-            print("\nFINAL ANALYSIS FILES:")
+            print("\nFULL PROJECT MODE: using all code files")
+
+            analysis_files = sorted(
+                deep_supported_files + lightweight_supported_files
+            )
+
             for f in analysis_files:
                 print(" -", f)
 
@@ -687,7 +1239,16 @@ def run_project(project_path, changed_files=None):
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [
-                executor.submit(process_code_file, project_id, pr_id, target_file, context_map, graph)
+                executor.submit(
+                    process_code_file,
+                    project_id,
+                    pr_id,
+                    target_file,
+                    context_map,
+                    graph,
+                    changed_files,
+                    args.force_reanalyze
+                )
                 for target_file in analysis_files
             ]
 
@@ -696,6 +1257,20 @@ def run_project(project_path, changed_files=None):
 
         module_reports = run_module_subagents(results)
         module_report_path = save_module_report(project_path, module_reports)
+
+        print("\n[6] RUNNING CLASS SUBAGENTS...")
+
+        class_reports = run_class_subagents(results)
+
+        class_report_path = save_class_report(
+            project_path,
+            class_reports
+        )
+
+        print(
+            f"Class report saved to: "
+            f"{class_report_path}"
+        )
 
         llm_count = 0
         fallback_count = 0
@@ -789,17 +1364,46 @@ def run_project(project_path, changed_files=None):
             "fallback_timeout_count": fallback_timeout_count,
             "llm_other_error_count": llm_other_error_count,
             "llm_parse_error_count": llm_parse_error_count,
-            "analysis_mode": "parallel" if max_workers > 1 else "sequential",
+            "analysis_mode": analysis_mode,
+            "execution_mode": "parallel" if max_workers > 1 else "sequential",
             "max_workers": max_workers,
             "graph_nodes": len(graph),
+            "structural_graph_nodes": structural_graph.get("nodes_count", 0),
+            "structural_graph_edges": structural_graph.get("edges_count", 0),
+            "structural_graph_types": structural_graph.get("graph_types", []),
             "dependency_edges": sum(
                 len(node.get("includes", []))
                 for node in graph.values()
                 if isinstance(node, dict)
             ),
+            "function_graph_nodes": len(function_graph),
+            "function_graph_edges": sum(
+                len(node.get("external_calls", []))
+                for node in function_graph.values()
+            ),
+            "clang_ast_files": len(clang_ast_report),
+            "clang_ast_classes": sum(
+                item.get("classes_count", 0)
+                for item in clang_ast_report.values()
+            ),
+            "clang_ast_functions": sum(
+                item.get("functions_count", 0)
+                for item in clang_ast_report.values()
+            ),
+            "clang_ast_raw_pointer_fields": sum(
+                item.get("raw_pointer_fields_count", 0)
+                for item in clang_ast_report.values()
+            ),
             "files_with_reverse_deps_count": files_with_reverse_deps_count,
             "llm_provider": os.getenv("LLM_PROVIDER", "ollama"),
-            "llm_model": os.getenv("LLM_MODEL", "deepseek-coder")
+            "llm_model": os.getenv("LLM_MODEL", "deepseek-coder"),
+            "files_by_language": language_summary,
+            "supported_languages": sorted(list(language_summary.keys())),
+            "deep_analysis_languages": ["cpp", "c"],
+            "routing_only_languages": sorted([
+            lang for lang in language_summary.keys()
+            if lang not in {"cpp", "c"}
+            ])
         }
 
         report_data = {
@@ -810,7 +1414,12 @@ def run_project(project_path, changed_files=None):
             "changed_files": changed_files or [],
             "summary": summary_payload,
             "results": results,
-            "module_reports": module_reports
+            "module_reports": module_reports,
+            "class_reports": class_reports,
+            "clang_ast_report": clang_ast_report,
+            "structural_graph": structural_graph,
+            "dependency_graph_svg": dependency_graph_svg,
+            "routing_only_files": routing_only_files
         }
 
         previous_report = load_previous_report(project_path)
@@ -879,11 +1488,36 @@ def run_project(project_path, changed_files=None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        path = sys.argv[1]
-        changed = sys.argv[2:]
-    else:
-        path = input("Project path: ")
-        changed = []
+    args = parse_args()
 
-    run_project(path, changed)
+    os.environ["LLM_PROVIDER"] = args.provider
+    os.environ["LLM_MODEL"] = args.model
+
+    if not args.path and not args.repo:
+        print("ERROR: provide --path or --repo")
+        sys.exit(1)
+
+    project_path = args.path
+
+    if args.repo:
+        try:
+            project_path = clone_repository(args.repo)
+        except Exception as e:
+            print("REPOSITORY CLONE FAILED:")
+            print(str(e))
+            sys.exit(1)
+
+    changed_files = []
+
+    if args.changed_files:
+        changed_files = [
+            x.strip()
+            for x in args.changed_files.split(";")
+            if x.strip()
+        ]
+
+    run_project(
+        project_path,
+        changed_files=changed_files,
+        analysis_mode=args.mode
+    )

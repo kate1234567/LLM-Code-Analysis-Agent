@@ -347,3 +347,137 @@ def run_fallback_analysis(
         "file": file_path,
         "bugs": bugs
     }
+
+def make_lightweight_bug(
+    bug,
+    severity,
+    cause,
+    fix,
+    line_number
+):
+    return {
+        "bug": bug,
+        "severity": severity,
+        "cause": cause,
+        "fix": fix,
+        "line_start": line_number,
+        "line_end": line_number,
+        "finding_scope": "local"
+    }
+
+
+def analyze_python(code):
+    findings = []
+    lines = code.splitlines()
+
+    for i, line in enumerate(lines, 1):
+        l = line.lower()
+
+        if "eval(" in l or "exec(" in l:
+            findings.append(make_lightweight_bug(
+                "unsafe-dynamic-execution",
+                "high",
+                "Dynamic code execution may lead to security risks.",
+                "Avoid eval()/exec() where possible.",
+                i
+            ))
+
+        if "subprocess" in l and "shell=true" in l:
+            findings.append(make_lightweight_bug(
+                "unsafe-command-execution",
+                "high",
+                "Shell execution may allow command injection.",
+                "Avoid shell=True and validate commands.",
+                i
+            ))
+
+        if "password =" in l or "token =" in l or "api_key =" in l:
+            findings.append(make_lightweight_bug(
+                "hardcoded-credentials",
+                "high",
+                "Credentials appear directly in code.",
+                "Move secrets to environment variables.",
+                i
+            ))
+
+    return findings
+
+
+def analyze_java(code):
+    findings = []
+    lines = code.splitlines()
+
+    for i, line in enumerate(lines, 1):
+        l = line.lower()
+
+        if "runtime.getruntime().exec(" in l:
+            findings.append(make_lightweight_bug(
+                "unsafe-command-execution",
+                "high",
+                "Runtime.exec may execute unsafe commands.",
+                "Avoid raw Runtime.exec() calls.",
+                i
+            ))
+
+        if "password =" in l or "token =" in l or "secret" in l:
+            findings.append(make_lightweight_bug(
+                "hardcoded-credentials",
+                "high",
+                "Credentials appear directly in code.",
+                "Use secure configuration storage.",
+                i
+            ))
+
+    return findings
+
+
+def analyze_javascript(code):
+    findings = []
+    lines = code.splitlines()
+
+    for i, line in enumerate(lines, 1):
+        l = line.lower()
+
+        if "eval(" in l:
+            findings.append(make_lightweight_bug(
+                "unsafe-dynamic-execution",
+                "high",
+                "eval() may execute unsafe code.",
+                "Avoid eval() usage.",
+                i
+            ))
+
+        if "innerhtml" in l:
+            findings.append(make_lightweight_bug(
+                "unsafe-dom-manipulation",
+                "medium",
+                "innerHTML may introduce XSS risks.",
+                "Prefer safer DOM APIs.",
+                i
+            ))
+
+        if "password =" in l or "token =" in l:
+            findings.append(make_lightweight_bug(
+                "hardcoded-credentials",
+                "high",
+                "Credentials appear directly in code.",
+                "Move secrets outside source code.",
+                i
+            ))
+
+    return findings
+
+
+def detect_lightweight_findings(file_path, file_code):
+    ext = os.path.splitext(file_path)[1].lower()
+
+    if ext == ".py":
+        return analyze_python(file_code)
+
+    if ext == ".java":
+        return analyze_java(file_code)
+
+    if ext in [".js", ".ts"]:
+        return analyze_javascript(file_code)
+
+    return []

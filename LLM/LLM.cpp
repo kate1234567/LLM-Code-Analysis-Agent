@@ -284,93 +284,246 @@ bool pathExists(const std::string& path) {
     return fs::exists(path);
 }
 
-void ensureWorktree(const std::string& repoPath, const std::string& worktreePath, const std::string& branchName) {
-    if (pathExists(worktreePath)) {
-        std::cout << "WORKTREE ALREADY EXISTS:\n" << worktreePath << "\n\n";
+void ensureWorktree(const std::string& repoPath, const std::string& projectPath, const std::string& branchName) {
+    if (pathExists(projectPath)) {
+        std::cout << "WORKTREE ALREADY EXISTS:\n" << projectPath << "\n\n";
         return;
     }
 
     std::string cmd =
-        "git -C \"" + repoPath + "\" worktree add \"" + worktreePath + "\" " + branchName;
+        "git -C \"" + repoPath + "\" worktree add \"" + projectPath + "\" " + branchName;
 
     std::cout << "CREATING WORKTREE...\n";
     std::string output = runCommand(cmd);
     std::cout << output << "\n";
 }
 
-void removeWorktree(const std::string& repoPath, const std::string& worktreePath) {
-    if (!pathExists(worktreePath)) {
+void removeWorktree(const std::string& repoPath, const std::string& projectPath) {
+    if (!pathExists(projectPath)) {
         return;
     }
 
     std::string cmd =
-        "git -C \"" + repoPath + "\" worktree remove \"" + worktreePath + "\" --force";
+        "git -C \"" + repoPath + "\" worktree remove \"" + projectPath + "\" --force";
 
     std::cout << "REMOVING WORKTREE...\n";
     std::string output = runCommand(cmd);
     std::cout << output << "\n";
 }
+bool isGitHubUrl(const std::string& input) {
+    return input.find("github.com") != std::string::npos;
+}
+
+std::string cloneRepository(const std::string& url) {
+    std::string tempPath = R"(C:\Users\katew\source\repos\temp_repo)";
+
+    if (fs::exists(tempPath)) {
+        std::string removeCmd =
+            "rmdir /s /q \"" + tempPath + "\"";
+        system(removeCmd.c_str());
+    }
+
+    std::string cloneCmd =
+        "git clone " + url + " \"" + tempPath + "\"";
+
+    std::cout << "\nCLONING REPOSITORY...\n";
+    system(cloneCmd.c_str());
+
+    return tempPath;
+}
 
 int main() {
-    std::string repoPath = R"(C:\Users\katew\source\repos\LLM)";
-    std::string branchName = "feature-test";
-    std::string worktreePath = R"(C:\Users\katew\source\repos\LLM_feature)";
-    std::string jsonOutputPath = R"(C:\Users\katew\source\repos\LLM\python\project_context.json)";
-    std::string baseBranch = "main";
+    std::string repoInput;
+    std::string repoPath;
+
+    std::cout << "ENTER REPOSITORY PATH OR GITHUB URL:\n";
+    std::getline(std::cin, repoInput);
+
+    if (repoInput.empty()) {
+        std::getline(std::cin, repoInput);
+    }
+
+    // если ссылка GitHub -> clone
+    // если локальный путь -> просто используем его
+    if (isGitHubUrl(repoInput)) {
+        repoPath = cloneRepository(repoInput);
+    }
+    else {
+        repoPath = repoInput;
+    }
+
+    std::string baseBranch;
+    std::string branchName;
+
+    std::string worktreePath =
+        R"(C:\Users\katew\source\repos\LLM_feature)";
+
+    std::string jsonOutputPath =
+        R"(C:\Users\katew\source\repos\LLM\python\project_context.json)";
+
+    std::cout << "ENTER BASE BRANCH (example: main or master):\n";
+    std::getline(std::cin, baseBranch);
+
+    std::cout << "ENTER BRANCH FOR ANALYSIS:\n";
+    std::getline(std::cin, branchName);
+
+    std::string analysisMode;
+    bool forceReanalyze = false;
+
+    std::cout << "SELECT ANALYSIS MODE:\n";
+    std::cout << "1 - FAST (changed files only)\n";
+    std::cout << "2 - FULL (full project analysis)\n";
+    std::cout << "3 - FULL WITHOUT CACHE (force re-analysis)\n";
+    std::cout << "Your choice: ";
+
+    int modeChoice;
+    std::cin >> modeChoice;
+
+    if (modeChoice == 1) {
+        analysisMode = "fast";
+    }
+    else if (modeChoice == 2) {
+        analysisMode = "full";
+    }
+    else if (modeChoice == 3) {
+        analysisMode = "full";
+        forceReanalyze = true;
+    }
+    else {
+        analysisMode = "full";
+    }
+
+    std::cout << "\nSELECTED MODE: "
+        << analysisMode
+        << "\n\n";
 
     try {
-        ensureWorktree(repoPath, worktreePath, branchName);
+        std::string projectPath;
 
-        std::vector<std::string> files = scanProject(worktreePath);
+        if (isGitHubUrl(repoInput)) {
+            projectPath = repoPath;
+        }
+        else {
+            ensureWorktree(
+                repoPath,
+                worktreePath,
+                branchName
+            );
 
-        std::cout << "PROJECT PATH:\n" << worktreePath << "\n\n";
+            projectPath = worktreePath;
+        }
+
+        std::vector<std::string> files =
+            scanProject(projectPath);
+
+        std::cout << "PROJECT PATH:\n"
+            << projectPath
+            << "\n\n";
+
         std::cout << "FOUND CODE FILES:\n";
+
         for (const auto& file : files) {
             std::cout << file << "\n";
         }
-        std::cout << "\nTOTAL: " << files.size() << "\n";
 
-        std::string branchCmd = "git -C \"" + worktreePath + "\" branch --show-current";
-        std::string currentBranch = runCommand(branchCmd);
+        std::cout << "\nTOTAL: "
+            << files.size()
+            << "\n";
 
-        while (!currentBranch.empty() && (currentBranch.back() == '\n' || currentBranch.back() == '\r')) {
+        std::string branchCmd =
+            "git -C \"" + projectPath +
+            "\" branch --show-current";
+
+        std::string currentBranch =
+            runCommand(branchCmd);
+
+        while (
+            !currentBranch.empty() &&
+            (
+                currentBranch.back() == '\n' ||
+                currentBranch.back() == '\r'
+                )
+            ) {
             currentBranch.pop_back();
         }
 
         exportContextToJson(
             jsonOutputPath,
             repoPath,
-            worktreePath,
+            projectPath,
             baseBranch,
             currentBranch,
             files
         );
 
-        std::cout << "\nJSON EXPORTED TO:\n" << jsonOutputPath << "\n\n";
+        std::cout << "\nJSON EXPORTED TO:\n"
+            << jsonOutputPath
+            << "\n\n";
 
         std::string diffFilesCmd =
-            "git -C \"" + repoPath + "\" diff --name-only " + baseBranch + ".." + currentBranch;
+            "git -C \"" + repoPath +
+            "\" diff --name-only " +
+            baseBranch +
+            ".." +
+            currentBranch;
 
-        std::string changedFilesRaw = runCommand(diffFilesCmd);
+        std::string changedFilesRaw =
+            runCommand(diffFilesCmd);
 
-        std::cout << "CURRENT BRANCH:\n" << currentBranch << "\n\n";
-        std::cout << "CHANGED FILES BETWEEN BRANCHES:\n" << changedFilesRaw << "\n";
+        std::string changedFilesArg =
+            changedFilesRaw;
 
-        std::vector<std::string> changedLines = splitLines(changedFilesRaw);
+        std::replace(
+            changedFilesArg.begin(),
+            changedFilesArg.end(),
+            '\n',
+            ';'
+        );
+
+        std::replace(
+            changedFilesArg.begin(),
+            changedFilesArg.end(),
+            '\r',
+            ' '
+        );
+
+        std::cout << "CURRENT BRANCH:\n"
+            << currentBranch
+            << "\n\n";
+
+        std::cout << "CHANGED FILES BETWEEN BRANCHES:\n"
+            << changedFilesRaw
+            << "\n";
 
         std::string pythonCmd =
-            "py C:\\Users\\katew\\source\\repos\\LLM\\python\\orchestrator.py \"" + worktreePath + "\"";
+            "py C:\\Users\\katew\\source\\repos\\LLM\\python\\orchestrator.py "
+            "--path \"" + projectPath + "\" "
+            "--provider auto "
+            "--model deepseek-coder "
+            "--workers 4 "
+            "--mode " + analysisMode +
+            " --base-branch " + baseBranch +
+            " --json-context \"" + jsonOutputPath + "\" "
+            "--changed-files \"" + changedFilesArg + "\"";
 
-        for (const auto& path : changedLines) {
-            pythonCmd += " \"" + path + "\"";
+        if (forceReanalyze) {
+            pythonCmd += " --force-reanalyze";
         }
 
-        std::string output = runCommand(pythonCmd);
+        std::cout << "\nRUNNING PYTHON ORCHESTRATOR:\n";
+        std::cout << pythonCmd << "\n\n";
 
-        std::cout << "\nPYTHON OUTPUT:\n" << output << std::endl;
+        std::string output =
+            runCommand(pythonCmd);
+
+        std::cout << "\nPYTHON OUTPUT:\n"
+            << output
+            << std::endl;
     }
     catch (const std::exception& ex) {
-        std::cerr << "ERROR: " << ex.what() << std::endl;
+        std::cerr << "ERROR: "
+            << ex.what()
+            << std::endl;
     }
 
     return 0;
