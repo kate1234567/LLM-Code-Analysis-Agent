@@ -1,0 +1,17 @@
+[
+  {
+    "module": "LLM",
+    "files_count": 4,
+    "architecture_findings": [
+      {
+        "problem": "Inter-file ownership/lifetime issue",
+        "cause": "Several findings depend on relations between header and implementation files.",
+        "files": [
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h"
+        ],
+        "severity": "high"
+      }
+    ]
+  }
+]

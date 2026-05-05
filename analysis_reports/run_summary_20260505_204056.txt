@@ -1,0 +1,96 @@
+LLM AGENT ANALYSIS SUMMARY
+========================================
+Project path: C:/Users/katew/source/repos/LLM_feature
+Generated at: 2026-05-05T20:40:55.297521
+
+SUMMARY
+--------------------
+Files analyzed: 4
+Total bugs: 6
+Local findings: 4
+Interfile findings: 2
+High severity: 4
+Medium severity: 2
+Low severity: 0
+LLM results: 2
+Fallback results: 2
+Fallback timeouts: 1
+LLM other rewrite errors: 0
+LLM parse errors: 1
+Analysis mode: fast
+Max workers: 4
+
+COMPARISON
+--------------------
+Previous report: C:/Users/katew/source/repos/LLM_feature\analysis_reports\run_report_20260505_175410.json
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 6
+
+UNCHANGED FINDINGS WITH CHANGES
+------------------------------
+File: C:/Users/katew/source/repos/LLM_feature\LLM\LLM.cpp
+Bug: unsafe-command-execution
+Lines: 12-12
+Scope: local
+Severity: high
+Changes: none
+
+File: C:/Users/katew/source/repos/LLM_feature\LLM\main.cpp
+Bug: unsafe-string-copy
+Lines: 12-12
+Scope: local
+Severity: medium
+Changes: none
+
+File: C:/Users/katew/source/repos/LLM_feature\LLM\utils.cpp
+Bug: manual-allocation-without-visible-release
+Lines: 22-22
+Scope: interfile
+Severity: high
+Changes: none
+
+File: C:/Users/katew/source/repos/LLM_feature\LLM\utils.cpp
+Bug: unsafe-command-execution
+Lines: 18-18
+Scope: local
+Severity: high
+Changes: none
+
+File: C:/Users/katew/source/repos/LLM_feature\LLM\utils.h
+Bug: raw-pointer-field-in-interface
+Lines: 15-15
+Scope: local
+Severity: medium
+Changes: none
+
+File: C:/Users/katew/source/repos/LLM_feature\LLM\utils.h
+Bug: raw-pointer-interface-without-release
+Lines: 12-12
+Scope: interfile
+Severity: high
+Changes: none
+
+FILES
+--------------------
+File: C:/Users/katew/source/repos/LLM_feature\LLM\main.cpp
+Source type: llm
+Bugs: 1
+  - unsafe-string-copy | severity=medium | lines=12-12 | scope=local
+
+File: C:/Users/katew/source/repos/LLM_feature\LLM\LLM.cpp
+Source type: fallback
+Bugs: 1
+  - unsafe-command-execution | severity=high | lines=12-12 | scope=local
+
+File: C:/Users/katew/source/repos/LLM_feature\LLM\utils.cpp
+Source type: llm
+Bugs: 2
+  - manual-allocation-without-visible-release | severity=high | lines=22-22 | scope=interfile
+  - unsafe-command-execution | severity=high | lines=18-18 | scope=local
+
+File: C:/Users/katew/source/repos/LLM_feature\LLM\utils.h
+Source type: fallback
+Bugs: 2
+  - raw-pointer-interface-without-release | severity=high | lines=12-12 | scope=interfile
+  - raw-pointer-field-in-interface | severity=medium | lines=15-15 | scope=local

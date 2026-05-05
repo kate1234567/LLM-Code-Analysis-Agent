@@ -1,0 +1,293 @@
+{
+  "project_id": "768a3ff7-4460-4542-bf28-b683ee60b510",
+  "pr_id": "64ab688e-a443-4d7a-b0de-cd8bd318c8f7",
+  "project_path": "C:\\Users\\katew\\source\\repos\\LLM_feature",
+  "generated_at": "2026-04-22T20:52:32.723457",
+  "changed_files": [
+    "LLM/LLM.cpp",
+    "LLM/main.cpp",
+    "LLM/utils.cpp",
+    "LLM/utils.h"
+  ],
+  "summary": {
+    "status": "success",
+    "results_count": 4,
+    "total_bugs": 6,
+    "local_findings_count": 5,
+    "interfile_findings_count": 1,
+    "llm_count": 2,
+    "fallback_count": 2,
+    "high_count": 4,
+    "medium_count": 2,
+    "low_count": 0,
+    "paired_header_count": 1,
+    "no_paired_header_count": 3,
+    "related_cpp_count": 1,
+    "no_related_cpp_count": 3,
+    "fallback_timeout_count": 2,
+    "fallback_other_error_count": 0,
+    "llm_parse_error_count": 0,
+    "analysis_mode": "parallel",
+    "max_workers": 4
+  },
+  "results": [
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+      "task_id": "c77ee795-f473-4501-b30c-9c781abc4f3e",
+      "result": {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+        "bugs": [
+          {
+            "bug": "unsafe-command-execution,",
+            "cause": "The command execution is not safe.",
+            "fix": "Use `std::system` to execute the commands instead of using raw C functions like system().",
+            "severity": "high",
+            "line_start": 10,
+            "line_end": 23
+          }
+        ],
+        "fallback_used": false
+      },
+      "finding_ids": [
+        "3cb5e9cb-b9ab-4ebb-b91e-8c491d303c27"
+      ],
+      "recommendation_ids": [
+        "a08e0927-3102-4be7-9ada-28d6be36a9a4"
+      ],
+      "source_type": "llm",
+      "has_paired_header": false,
+      "has_related_cpp": false
+    },
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+      "task_id": "ef52fd7c-b4ea-4adc-80e5-8febc7aa23d1",
+      "result": {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+        "bugs": [
+          {
+            "bug": "unsafe-command-execution",
+            "cause": "The `CommandRunner` class in the utils.cpp file has a system call inside its constructor which could lead to command injection attacks if an attacker can control one of these calls or pass it as part of user input, leading them into executing arbitrary commands on their behalf.",
+            "fix": "Use safer alternatives for such operations like `system()` and use RAII (Resource Acquisition Is Initialization) where possible instead of manually managing memory allocation/deallocation in the constructor method to avoid this kind of issue by using smart pointers or unique_ptr from C++14.",
+            "severity": "medium",
+            "line_start": 2,
+            "line_end": 2
+          }
+        ],
+        "fallback_used": false
+      },
+      "finding_ids": [
+        "6389278d-f4f2-44b7-b60b-f80e9a40d478"
+      ],
+      "recommendation_ids": [
+        "50876985-994e-4938-b377-208dbd16ade8"
+      ],
+      "source_type": "llm",
+      "has_paired_header": true,
+      "has_related_cpp": false
+    },
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+      "task_id": "14c20b93-e4f0-4d00-ba2b-d60f83bcb55c",
+      "result": {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+        "bugs": [
+          {
+            "bug": "hardcoded-credentials",
+            "cause": "Credentials appear directly in code or command strings.",
+            "fix": "Move credentials to environment variables or protected configuration.",
+            "severity": "high",
+            "line_start": 8,
+            "line_end": 8,
+            "finding_scope": "local"
+          },
+          {
+            "bug": "unsafe-string-copy",
+            "cause": "strcpy may overflow the destination buffer.",
+            "fix": "Use bounded alternatives or std::string.",
+            "severity": "high",
+            "line_start": 12,
+            "line_end": 12,
+            "finding_scope": "local"
+          }
+        ],
+        "fallback_used": true,
+        "fallback_reason": "HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=30)"
+      },
+      "finding_ids": [
+        "c96f7aad-77b0-4cb5-90e9-9467ddbc03d7",
+        "a3276871-64d7-483d-b041-b611aeb1363c"
+      ],
+      "recommendation_ids": [
+        "b6da43d4-73f7-4193-9c2f-fa4728754881",
+        "361d906d-8ba1-4296-bd5b-47b10cd4131b"
+      ],
+      "source_type": "fallback",
+      "has_paired_header": false,
+      "has_related_cpp": false
+    },
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h",
+      "task_id": "1d31d723-4460-46cc-8940-1858a582d5f9",
+      "result": {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h",
+        "bugs": [
+          {
+            "bug": "raw-pointer-interface-without-release",
+            "cause": "Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.",
+            "fix": "Add explicit safe cleanup logic or replace the interface and implementation with RAII-based ownership.",
+            "severity": "high",
+            "line_start": 12,
+            "line_end": 12,
+            "finding_scope": "interfile"
+          },
+          {
+            "bug": "raw-pointer-field-in-interface",
+            "cause": "Header declares a raw pointer field, which may lead to ownership and lifetime issues.",
+            "fix": "Prefer std::string, std::vector, smart pointers, or explicit ownership documentation.",
+            "severity": "medium",
+            "line_start": 15,
+            "line_end": 15,
+            "finding_scope": "local"
+          }
+        ],
+        "fallback_used": true,
+        "fallback_reason": "HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=30)"
+      },
+      "finding_ids": [
+        "0bfad83b-fe3f-4e4d-8981-b52131d55953",
+        "86471229-707b-447b-957c-b7d6cc8295f1"
+      ],
+      "recommendation_ids": [
+        "6555aa7c-9f94-48fe-9354-814b3c7fd65a",
+        "e8ce13e7-94e4-4fb5-9c7c-93d7dc728393"
+      ],
+      "source_type": "fallback",
+      "has_paired_header": false,
+      "has_related_cpp": true
+    }
+  ],
+  "comparison": {
+    "previous_report_path": "C:\\Users\\katew\\source\\repos\\LLM_feature\\analysis_reports\\run_report_20260422_204601.json",
+    "new_findings_count": 2,
+    "resolved_findings_count": 8,
+    "unchanged_findings_count": 4,
+    "new_findings": [
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+        "bug": "unsafe-command-execution,",
+        "severity": "high",
+        "line_start": 10,
+        "line_end": 23,
+        "finding_scope": null
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+        "bug": "unsafe-command-execution",
+        "severity": "medium",
+        "line_start": 2,
+        "line_end": 2,
+        "finding_scope": null
+      }
+    ],
+    "resolved_findings": [
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+        "bug": "external-tool-dependency",
+        "severity": "medium",
+        "line_start": 31,
+        "line_end": 31,
+        "finding_scope": "local"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+        "bug": "external-tool-dependency",
+        "severity": "medium",
+        "line_start": 39,
+        "line_end": 39,
+        "finding_scope": "local"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+        "bug": "external-tool-dependency",
+        "severity": "medium",
+        "line_start": 48,
+        "line_end": 48,
+        "finding_scope": "local"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+        "bug": "unsafe-command-execution",
+        "severity": "high",
+        "line_start": 12,
+        "line_end": 12,
+        "finding_scope": "local"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+        "bug": "weak-error-propagation",
+        "severity": "medium",
+        "line_start": 66,
+        "line_end": 66,
+        "finding_scope": "local"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+        "bug": "hardcoded-credentials",
+        "severity": "high",
+        "line_start": 14,
+        "line_end": 14,
+        "finding_scope": "local"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+        "bug": "manual-allocation-without-visible-release",
+        "severity": "high",
+        "line_start": 22,
+        "line_end": 22,
+        "finding_scope": "interfile"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+        "bug": "unsafe-command-execution",
+        "severity": "high",
+        "line_start": 18,
+        "line_end": 18,
+        "finding_scope": "local"
+      }
+    ],
+    "unchanged_findings": [
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+        "bug": "hardcoded-credentials",
+        "severity": "high",
+        "line_start": 8,
+        "line_end": 8,
+        "finding_scope": "local"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+        "bug": "unsafe-string-copy",
+        "severity": "high",
+        "line_start": 12,
+        "line_end": 12,
+        "finding_scope": "local"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h",
+        "bug": "raw-pointer-field-in-interface",
+        "severity": "medium",
+        "line_start": 15,
+        "line_end": 15,
+        "finding_scope": "local"
+      },
+      {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h",
+        "bug": "raw-pointer-interface-without-release",
+        "severity": "high",
+        "line_start": 12,
+        "line_end": 12,
+        "finding_scope": "interfile"
+      }
+    ]
+  }
+}

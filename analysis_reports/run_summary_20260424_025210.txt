@@ -1,0 +1,50 @@
+LLM AGENT ANALYSIS SUMMARY
+========================================
+Project path: C:\Users\katew\source\repos\LLM_feature
+Generated at: 2026-04-24T02:52:10.288288
+
+SUMMARY
+--------------------
+Files analyzed: 4
+Total bugs: 0
+Local findings: 0
+Interfile findings: 0
+High severity: 0
+Medium severity: 0
+Low severity: 0
+LLM results: 0
+Fallback results: 0
+Fallback timeouts: 0
+LLM other rewrite errors: 0
+LLM parse errors: 0
+Analysis mode: parallel
+Max workers: 4
+
+COMPARISON
+--------------------
+Previous report: C:\Users\katew\source\repos\LLM_feature\analysis_reports\run_report_20260424_024201.json
+New findings: 0
+Resolved findings: 12
+Unchanged findings: 0
+
+FILES
+--------------------
+File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Source type: error
+Bugs: 0
+  - no bugs
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+Source type: error
+Bugs: 0
+  - no bugs
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+Source type: error
+Bugs: 0
+  - no bugs
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+Source type: error
+Bugs: 0
+  - no bugs

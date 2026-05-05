@@ -1,0 +1,446 @@
+FINAL PROJECT REVIEW REPORT
+============================================================
+Generated at: 2026-05-03T22:10:49.132812
+Project path: C:\Users\katew\source\repos\LLM_feature
+
+1. PROJECT-WIDE CONTEXT
+------------------------------------------------------------
+Graph nodes: 4
+Dependency edges: 4
+Files with reverse dependencies: 0
+Interfile findings: 4
+LLM provider: ollama
+LLM model: deepseek-coder
+
+2. PROJECT SUMMARY
+------------------------------------------------------------
+Files analyzed: 4
+Total findings: 53
+Local findings: 49
+Interfile findings: 4
+LLM results: 0
+Fallback results: 0
+Analysis mode: parallel
+Max workers: 4
+
+3. CHANGED FILES
+------------------------------------------------------------
+- no changed files were passed
+
+4. FILE-LEVEL FINDINGS
+------------------------------------------------------------
+1. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+2. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+3. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+4. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+5. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+6. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+7. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+8. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+9. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+10. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+11. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+12. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+13. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+14. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+15. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+16. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+17. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+18. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+19. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+20. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+21. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+22. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+23. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+24. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+25. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+26. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+27. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+28. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: interfile
+   Cause: 
+   Fix: 
+
+29. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: interfile
+   Cause: 
+   Fix: 
+
+30. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: interfile
+   Cause: 
+   Fix: 
+
+31. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+32. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+33. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+34. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+35. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+36. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+37. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+38. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+39. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+40. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: None-None
+   Scope: interfile
+   Cause: 
+   Fix: 
+
+41. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+42. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+43. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+44. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+45. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+46. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+47. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+48. [MEDIUM] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+49. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+50. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+51. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+52. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+53. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: None-None
+   Scope: local
+   Cause: 
+   Fix: 
+
+5. INTERFILE FINDINGS
+------------------------------------------------------------
+1. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Cause: 
+   Fix: 
+
+2. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Cause: 
+   Fix: 
+
+3. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: None-None
+   Cause: 
+   Fix: 
+
+4. [HIGH] unknown
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: None-None
+   Cause: 
+   Fix: 
+
+6. MODULE ARCHITECTURE FINDINGS
+------------------------------------------------------------
+Module: LLM
+  - [HIGH] Inter-file ownership/lifetime issue
+    Cause: Several findings depend on relations between header and implementation files.
+    Files: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+
+
+7. COMPARISON WITH PREVIOUS RUN
+------------------------------------------------------------
+Previous report: C:\Users\katew\source\repos\LLM_feature\analysis_reports\run_report_20260503_221002.json
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 0
+
+8. CONCLUSION
+------------------------------------------------------------
+The project contains high-risk findings. Manual review is recommended before merging.

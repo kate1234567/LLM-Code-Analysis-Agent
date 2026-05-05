@@ -1,0 +1,189 @@
+FINAL PROJECT REVIEW REPORT
+============================================================
+Generated at: 2026-05-04T03:48:45.792284
+Project path: C:\Users\katew\source\repos\LLM_feature
+
+1. PROJECT-WIDE CONTEXT
+------------------------------------------------------------
+Graph nodes: 4
+Dependency edges: 4
+Files with reverse dependencies: 1
+Interfile findings: 2
+LLM provider: ollama
+LLM model: deepseek-coder
+
+2. PROJECT SUMMARY
+------------------------------------------------------------
+Files analyzed: 4
+Total findings: 12
+Local findings: 10
+Interfile findings: 2
+LLM results: 2
+Fallback results: 2
+Analysis mode: full
+Max workers: 4
+
+3. CHANGED FILES
+------------------------------------------------------------
+- .gitignore
+- LLM/LLM.cpp
+- LLM/main.cpp
+- LLM/utils.cpp
+- LLM/utils.h
+- README.md
+- database/schema.sql
+- python/chunker.py
+- python/context_builder.py
+- python/context_selector.py
+- python/db_writer.py
+- python/fallback_analyzer.py
+- python/final_report_generator.py
+- python/git_helper.py
+- python/html_report_generator.py
+- python/issue.json
+- python/json_context_loader.py
+- python/llm_agent.py
+- python/llm_client.py
+- python/module_subagent.py
+- python/orchestrator.py
+- python/project_analyzer.py
+- python/project_context_builder.py
+- python/project_graph_builder.py
+- python/project_scanner.py
+- python/subagent_runner.py
+- python/symbol_extractor.py
+- python/test_subagent.py
+
+4. FILE-LEVEL FINDINGS
+------------------------------------------------------------
+1. [HIGH] hardcoded-credentials
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: 8-8
+   Scope: local
+   Cause: Credentials appear directly in code or command strings.
+   Fix: Move credentials to environment variables or protected configuration.
+
+2. [HIGH] unsafe-string-copy
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+   Lines: 12-12
+   Scope: local
+   Cause: strcpy may overflow the destination buffer.
+   Fix: Use bounded alternatives or std::string.
+
+3. [MEDIUM] unsafe-command-execution
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: 12-12
+   Scope: local
+   Cause: Avoid raw shell execution when possible. Validate inputs and prefer safer process APIs.
+   Fix: Prefer using system calls for file I/O, such as fread(), fwrite() etc., instead of low-level _popen().
+
+4. [MEDIUM] external-tool-dependency
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: 31-31
+   Scope: local
+   Cause: Code depends on external command-line tools without explicit availability checks.
+   Fix: Check tool availability before execution and handle missing tools gracefully.
+
+5. [MEDIUM] external-tool-dependency
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: 39-39
+   Scope: local
+   Cause: Code depends on external command-line tools without explicit availability checks.
+   Fix: Check tool availability before execution and handle missing tools gracefully.
+
+6. [MEDIUM] external-tool-dependency
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: 48-48
+   Scope: local
+   Cause: Code depends on external command-line tools without explicit availability checks.
+   Fix: Check tool availability before execution and handle missing tools gracefully.
+
+7. [MEDIUM] weak-error-propagation
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+   Lines: 66-66
+   Scope: local
+   Cause: Errors may be logged but not propagated to caller as failure status.
+   Fix: Return a non-zero exit code or propagate failure state.
+
+8. [HIGH] manual-allocation-without-visible-release
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: 22-22
+   Scope: interfile
+   Cause: Implementation performs manual allocation for an interface exposing raw pointers, but no matching release operation is visible in the implementation.
+   Fix: Add explicit cleanup logic or replace manual ownership with RAII-based abstractions.
+
+9. [HIGH] hardcoded-credentials
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: 14-14
+   Scope: local
+   Cause: Credentials appear directly in code or command strings.
+   Fix: Move credentials to environment variables or protected configuration.
+
+10. [HIGH] unsafe-command-execution
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: 18-18
+   Scope: local
+   Cause: Use of system may allow unsafe command execution or command injection.
+   Fix: Avoid raw shell execution when possible. Validate inputs and prefer safer process APIs.
+
+11. [HIGH] raw-pointer-interface-without-release
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: 12-12
+   Scope: interfile
+   Cause: Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.
+   Fix: Add explicit safe cleanup logic or replace the interface and implementation with RAII-based ownership.
+
+12. [MEDIUM] raw-pointer-field-in-interface
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: 15-15
+   Scope: local
+   Cause: Header declares a raw pointer field, which may lead to ownership and lifetime issues.
+   Fix: Prefer std::string, std::vector, smart pointers, or explicit ownership documentation.
+
+5. INTERFILE FINDINGS
+------------------------------------------------------------
+1. [HIGH] manual-allocation-without-visible-release
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+   Lines: 22-22
+   Cause: Implementation performs manual allocation for an interface exposing raw pointers, but no matching release operation is visible in the implementation.
+   Fix: Add explicit cleanup logic or replace manual ownership with RAII-based abstractions.
+
+2. [HIGH] raw-pointer-interface-without-release
+   File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+   Lines: 12-12
+   Cause: Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.
+   Fix: Add explicit safe cleanup logic or replace the interface and implementation with RAII-based ownership.
+
+6. MODULE ARCHITECTURE FINDINGS
+------------------------------------------------------------
+Module: LLM
+  - [HIGH] Inter-file ownership/lifetime issue
+    Cause: Several findings depend on relations between header and implementation files.
+    Files: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+  - [HIGH] Unsafe raw pointer design across module
+    Cause: Raw pointers or manual memory management appear in several module files.
+    Files: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+  - [HIGH] Unsafe external command execution
+    Cause: The module executes shell/system commands, which may create command injection risks.
+    Files: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+  - [HIGH] Secrets are stored directly in code
+    Cause: Credentials or tokens are detected in source files.
+    Files: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+  - [MEDIUM] Shared header is used by several implementation files
+    Cause: The module contains header files connected with several implementation files, so interface changes may affect multiple files.
+    Files: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+  - [LOW] Module analysis was fully restored from cache
+    Cause: All files in this module were skipped by hash cache, which shows that repeated analysis avoids unnecessary LLM calls.
+    Files: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+
+
+7. COMPARISON WITH PREVIOUS RUN
+------------------------------------------------------------
+Previous report: C:\Users\katew\source\repos\LLM_feature\analysis_reports\run_report_20260504_025841.json
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 12
+
+8. CONCLUSION
+------------------------------------------------------------
+The project contains high-risk findings. Manual review is recommended before merging.

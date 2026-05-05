@@ -1,0 +1,99 @@
+LLM AGENT ANALYSIS SUMMARY
+========================================
+Project path: C:\Users\katew\source\repos\LLM_feature
+Generated at: 2026-05-03T22:10:49.130813
+
+SUMMARY
+--------------------
+Files analyzed: 4
+Total bugs: 53
+Local findings: 49
+Interfile findings: 4
+High severity: 35
+Medium severity: 18
+Low severity: 0
+LLM results: 0
+Fallback results: 0
+Fallback timeouts: 0
+LLM other rewrite errors: 0
+LLM parse errors: 0
+Analysis mode: parallel
+Max workers: 4
+
+COMPARISON
+--------------------
+Previous report: C:\Users\katew\source\repos\LLM_feature\analysis_reports\run_report_20260503_221002.json
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 0
+
+FILES
+--------------------
+File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Source type: cache
+Bugs: 23
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+Source type: cache
+Bugs: 14
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=interfile
+  - None | severity=high | lines=None-None | scope=interfile
+  - None | severity=high | lines=None-None | scope=interfile
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+Source type: cache
+Bugs: 6
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=interfile
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+Source type: cache
+Bugs: 10
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=medium | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local
+  - None | severity=high | lines=None-None | scope=local

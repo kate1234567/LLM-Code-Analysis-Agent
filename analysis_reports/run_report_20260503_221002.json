@@ -1,0 +1,88 @@
+{
+  "project_id": "768a3ff7-4460-4542-bf28-b683ee60b510",
+  "pr_id": "64ab688e-a443-4d7a-b0de-cd8bd318c8f7",
+  "project_path": "C:\\Users\\katew\\source\\repos\\LLM_feature",
+  "generated_at": "2026-05-03T22:10:02.791128",
+  "changed_files": [],
+  "summary": {
+    "status": "success",
+    "results_count": 4,
+    "total_bugs": 0,
+    "local_findings_count": 0,
+    "interfile_findings_count": 0,
+    "llm_count": 0,
+    "fallback_count": 0,
+    "high_count": 0,
+    "medium_count": 0,
+    "low_count": 0,
+    "paired_header_count": 0,
+    "no_paired_header_count": 4,
+    "related_cpp_count": 0,
+    "no_related_cpp_count": 4,
+    "fallback_timeout_count": 0,
+    "llm_other_error_count": 0,
+    "llm_parse_error_count": 0,
+    "analysis_mode": "parallel",
+    "max_workers": 4,
+    "graph_nodes": 4,
+    "dependency_edges": 4,
+    "files_with_reverse_deps_count": 0,
+    "llm_provider": "ollama",
+    "llm_model": "deepseek-coder",
+    "files_by_language": {
+      "cpp": 4
+    },
+    "deep_analysis_languages": [
+      "cpp",
+      "c"
+    ],
+    "routing_only_languages": []
+  },
+  "results": [
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+      "error": "name 'old_findings_from_db' is not defined",
+      "source_type": "error",
+      "has_paired_header": false,
+      "has_related_cpp": false
+    },
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+      "error": "name 'old_findings_from_db' is not defined",
+      "source_type": "error",
+      "has_paired_header": false,
+      "has_related_cpp": false
+    },
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+      "error": "name 'old_findings_from_db' is not defined",
+      "source_type": "error",
+      "has_paired_header": false,
+      "has_related_cpp": false
+    },
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h",
+      "error": "name 'old_findings_from_db' is not defined",
+      "source_type": "error",
+      "has_paired_header": false,
+      "has_related_cpp": false
+    }
+  ],
+  "module_reports": [
+    {
+      "module": "LLM",
+      "files_count": 4,
+      "architecture_findings": []
+    }
+  ],
+  "routing_only_files": [],
+  "comparison": {
+    "previous_report_path": "C:\\Users\\katew\\source\\repos\\LLM_feature\\analysis_reports\\run_report_20260503_220758.json",
+    "new_findings_count": 0,
+    "resolved_findings_count": 0,
+    "unchanged_findings_count": 0,
+    "new_findings": [],
+    "resolved_findings": [],
+    "unchanged_findings": []
+  }
+}

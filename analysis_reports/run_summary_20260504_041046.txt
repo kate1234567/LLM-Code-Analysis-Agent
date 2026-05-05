@@ -1,0 +1,144 @@
+LLM AGENT ANALYSIS SUMMARY
+========================================
+Project path: C:\Users\katew\source\repos\LLM_feature
+Generated at: 2026-05-04T04:10:46.144713
+
+SUMMARY
+--------------------
+Files analyzed: 4
+Total bugs: 12
+Local findings: 10
+Interfile findings: 2
+High severity: 6
+Medium severity: 6
+Low severity: 0
+LLM results: 2
+Fallback results: 2
+Fallback timeouts: 0
+LLM other rewrite errors: 2
+LLM parse errors: 0
+Analysis mode: full
+Max workers: 4
+
+COMPARISON
+--------------------
+Previous report: C:\Users\katew\source\repos\LLM_feature\analysis_reports\run_report_20260504_040446.json
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 12
+
+UNCHANGED FINDINGS WITH CHANGES
+------------------------------
+File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Bug: external-tool-dependency
+Lines: 31-31
+Scope: local
+Severity: medium
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Bug: external-tool-dependency
+Lines: 39-39
+Scope: local
+Severity: medium
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Bug: external-tool-dependency
+Lines: 48-48
+Scope: local
+Severity: medium
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Bug: unsafe-command-execution
+Lines: 12-12
+Scope: local
+Severity: medium
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Bug: weak-error-propagation
+Lines: 66-66
+Scope: local
+Severity: medium
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+Bug: hardcoded-credentials
+Lines: 8-8
+Scope: local
+Severity: high
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+Bug: unsafe-string-copy
+Lines: 12-12
+Scope: local
+Severity: high
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+Bug: hardcoded-credentials
+Lines: 14-14
+Scope: local
+Severity: high
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+Bug: manual-allocation-without-visible-release
+Lines: 22-22
+Scope: interfile
+Severity: high
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+Bug: unsafe-command-execution
+Lines: 18-18
+Scope: local
+Severity: high
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+Bug: raw-pointer-field-in-interface
+Lines: 15-15
+Scope: local
+Severity: medium
+Changes: none
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+Bug: raw-pointer-interface-without-release
+Lines: 12-12
+Scope: interfile
+Severity: high
+Changes: none
+
+FILES
+--------------------
+File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Source type: cache
+Bugs: 5
+  - unsafe-command-execution | severity=medium | lines=12-12 | scope=local
+  - external-tool-dependency | severity=medium | lines=31-31 | scope=local
+  - external-tool-dependency | severity=medium | lines=39-39 | scope=local
+  - external-tool-dependency | severity=medium | lines=48-48 | scope=local
+  - weak-error-propagation | severity=medium | lines=66-66 | scope=local
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+Source type: cache
+Bugs: 2
+  - hardcoded-credentials | severity=high | lines=8-8 | scope=local
+  - unsafe-string-copy | severity=high | lines=12-12 | scope=local
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+Source type: cache
+Bugs: 2
+  - raw-pointer-interface-without-release | severity=high | lines=12-12 | scope=interfile
+  - raw-pointer-field-in-interface | severity=medium | lines=15-15 | scope=local
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+Source type: cache
+Bugs: 3
+  - manual-allocation-without-visible-release | severity=high | lines=22-22 | scope=interfile
+  - hardcoded-credentials | severity=high | lines=14-14 | scope=local
+  - unsafe-command-execution | severity=high | lines=18-18 | scope=local

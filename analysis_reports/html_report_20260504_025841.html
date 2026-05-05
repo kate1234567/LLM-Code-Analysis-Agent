@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LLM Agent Analysis Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        h1, h2 {
+            color: #1f2937;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card-title {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .risk-high {
+            color: #b91c1c;
+        }
+
+        .risk-medium {
+            color: #b45309;
+        }
+
+        .risk-low {
+            color: #047857;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        th {
+            background: #111827;
+            color: white;
+        }
+
+        .severity-high {
+            color: #b91c1c;
+            font-weight: bold;
+        }
+
+        .severity-medium {
+            color: #b45309;
+            font-weight: bold;
+        }
+
+        .severity-low {
+            color: #047857;
+            font-weight: bold;
+        }
+
+        .module-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .small {
+            color: #666;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h1>LLM Agent Analysis Report</h1>
+    <p class="small">Generated at: 2026-05-04T02:58:41.357825</p>
+    <p class="small">Project path: C:\Users\katew\source\repos\LLM_feature</p>
+
+    <h2>Project Summary</h2>
+<div class="summary-grid">
+    <div class="card">
+        <div class="card-title">Risk level</div>
+        <div class="card-value risk-high">HIGH</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Files analyzed</div>
+        <div class="card-value">4</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Total findings</div>
+        <div class="card-value">12</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Interfile findings</div>
+        <div class="card-value">2</div>
+    </div>
+    <div class="card">
+        <div class="card-title">High severity</div>
+        <div class="card-value risk-high">6</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Medium severity</div>
+        <div class="card-value risk-medium">6</div>
+    </div>
+    <div class="card">
+        <div class="card-title">LLM results</div>
+        <div class="card-value">2</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Max workers</div>
+        <div class="card-value">4</div>
+    </div>
+</div>
+
+<h2>Project-wide Context</h2>
+<div class="summary-grid">
+    <div class="card">
+        <div class="card-title">Graph nodes</div>
+        <div class="card-value">4</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Dependency edges</div>
+        <div class="card-value">4</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Files with reverse dependencies</div>
+        <div class="card-value">1</div>
+    </div>
+    <div class="card">
+        <div class="card-title">LLM provider</div>
+        <div class="card-value">ollama</div>
+    </div>
+    <div class="card">
+        <div class="card-title">LLM model</div>
+        <div class="card-value">deepseek-coder</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Analysis mode</div>
+        <div class="card-value">full</div>
+    </div>
+</div>
+
+<h2>Languages</h2>
+<div class="summary-grid">
+    
+        <div class="card">
+            <div class="card-title">cpp</div>
+            <div class="card-value">4</div>
+        </div>
+        
+</div>
+
+<h2>File-level Findings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Severity</th>
+                <th>Bug</th>
+                <th>Scope</th>
+                <th>File</th>
+                <th>Lines</th>
+                <th>Cause</th>
+                <th>Fix</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr>
+            <td><span class="severity-high">HIGH</span></td>
+            <td>hardcoded-credentials</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp</td>
+            <td>8-8</td>
+            <td>Credentials appear directly in code or command strings.</td>
+            <td>Move credentials to environment variables or protected configuration.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-high">HIGH</span></td>
+            <td>unsafe-string-copy</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp</td>
+            <td>12-12</td>
+            <td>strcpy may overflow the destination buffer.</td>
+            <td>Use bounded alternatives or std::string.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-medium">MEDIUM</span></td>
+            <td>unsafe-command-execution</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp</td>
+            <td>12-12</td>
+            <td>Avoid raw shell execution when possible. Validate inputs and prefer safer process APIs.</td>
+            <td>Prefer using system calls for file I/O, such as fread(), fwrite() etc., instead of low-level _popen().</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-medium">MEDIUM</span></td>
+            <td>external-tool-dependency</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp</td>
+            <td>31-31</td>
+            <td>Code depends on external command-line tools without explicit availability checks.</td>
+            <td>Check tool availability before execution and handle missing tools gracefully.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-medium">MEDIUM</span></td>
+            <td>external-tool-dependency</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp</td>
+            <td>39-39</td>
+            <td>Code depends on external command-line tools without explicit availability checks.</td>
+            <td>Check tool availability before execution and handle missing tools gracefully.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-medium">MEDIUM</span></td>
+            <td>external-tool-dependency</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp</td>
+            <td>48-48</td>
+            <td>Code depends on external command-line tools without explicit availability checks.</td>
+            <td>Check tool availability before execution and handle missing tools gracefully.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-medium">MEDIUM</span></td>
+            <td>weak-error-propagation</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp</td>
+            <td>66-66</td>
+            <td>Errors may be logged but not propagated to caller as failure status.</td>
+            <td>Return a non-zero exit code or propagate failure state.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-high">HIGH</span></td>
+            <td>manual-allocation-without-visible-release</td>
+            <td>interfile</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp</td>
+            <td>22-22</td>
+            <td>Implementation performs manual allocation for an interface exposing raw pointers, but no matching release operation is visible in the implementation.</td>
+            <td>Add explicit cleanup logic or replace manual ownership with RAII-based abstractions.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-high">HIGH</span></td>
+            <td>hardcoded-credentials</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp</td>
+            <td>14-14</td>
+            <td>Credentials appear directly in code or command strings.</td>
+            <td>Move credentials to environment variables or protected configuration.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-high">HIGH</span></td>
+            <td>unsafe-command-execution</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp</td>
+            <td>18-18</td>
+            <td>Use of system may allow unsafe command execution or command injection.</td>
+            <td>Avoid raw shell execution when possible. Validate inputs and prefer safer process APIs.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-high">HIGH</span></td>
+            <td>raw-pointer-interface-without-release</td>
+            <td>interfile</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\utils.h</td>
+            <td>12-12</td>
+            <td>Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.</td>
+            <td>Add explicit safe cleanup logic or replace the interface and implementation with RAII-based ownership.</td>
+        </tr>
+        
+        <tr>
+            <td><span class="severity-medium">MEDIUM</span></td>
+            <td>raw-pointer-field-in-interface</td>
+            <td>local</td>
+            <td>C:\Users\katew\source\repos\LLM_feature\LLM\utils.h</td>
+            <td>15-15</td>
+            <td>Header declares a raw pointer field, which may lead to ownership and lifetime issues.</td>
+            <td>Prefer std::string, std::vector, smart pointers, or explicit ownership documentation.</td>
+        </tr>
+        
+        </tbody>
+    </table>
+
+    <h2>Module Architecture Findings</h2>
+    
+        <div class="module-card">
+            <h3>LLM</h3>
+            <ul>
+                
+            <li>
+                <b>Inter-file ownership/lifetime issue</b>
+                <br>
+                Severity: <span class="severity-high">
+                    HIGH
+                </span>
+                <br>
+                Cause: Several findings depend on relations between header and implementation files.
+                <br>
+                Files: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+            </li>
+            
+            <li>
+                <b>Unsafe raw pointer design across module</b>
+                <br>
+                Severity: <span class="severity-high">
+                    HIGH
+                </span>
+                <br>
+                Cause: Raw pointers or manual memory management appear in several module files.
+                <br>
+                Files: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+            </li>
+            
+            <li>
+                <b>Unsafe external command execution</b>
+                <br>
+                Severity: <span class="severity-high">
+                    HIGH
+                </span>
+                <br>
+                Cause: The module executes shell/system commands, which may create command injection risks.
+                <br>
+                Files: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+            </li>
+            
+            <li>
+                <b>Secrets are stored directly in code</b>
+                <br>
+                Severity: <span class="severity-high">
+                    HIGH
+                </span>
+                <br>
+                Cause: Credentials or tokens are detected in source files.
+                <br>
+                Files: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+            </li>
+            
+            <li>
+                <b>Shared header is used by several implementation files</b>
+                <br>
+                Severity: <span class="severity-medium">
+                    MEDIUM
+                </span>
+                <br>
+                Cause: The module contains header files connected with several implementation files, so interface changes may affect multiple files.
+                <br>
+                Files: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+            </li>
+            
+            <li>
+                <b>Module analysis was fully restored from cache</b>
+                <br>
+                Severity: <span class="severity-low">
+                    LOW
+                </span>
+                <br>
+                Cause: All files in this module were skipped by hash cache, which shows that repeated analysis avoids unnecessary LLM calls.
+                <br>
+                Files: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp, C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+            </li>
+            
+            </ul>
+        </div>
+        
+
+    <h2>Comparison With Previous Run</h2>
+    <div class="card">
+        <p>Previous report: C:\Users\katew\source\repos\LLM_feature\analysis_reports\run_report_20260504_025738.json</p>
+        <p>New findings: 0</p>
+        <p>Resolved findings: 0</p>
+        <p>Unchanged findings: 12</p>
+    </div>
+</body>
+</html>

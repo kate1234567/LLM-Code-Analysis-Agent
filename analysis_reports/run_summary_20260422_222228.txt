@@ -1,0 +1,42 @@
+LLM AGENT ANALYSIS SUMMARY
+========================================
+Project path: C:\Users\katew\source\repos\LLM_feature
+Generated at: 2026-04-22T22:22:28.130801
+
+SUMMARY
+--------------------
+Files analyzed: 4
+Total bugs: 0
+Local findings: 0
+Interfile findings: 0
+High severity: 0
+Medium severity: 0
+Low severity: 0
+LLM results: 0
+Fallback results: 0
+
+FILES
+--------------------
+FILE: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Source type: error
+Paired header: False
+Related cpp: False
+  No issues found
+
+FILE: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+Source type: error
+Paired header: False
+Related cpp: False
+  No issues found
+
+FILE: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+Source type: error
+Paired header: True
+Related cpp: False
+  No issues found
+
+FILE: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+Source type: error
+Paired header: False
+Related cpp: True
+  No issues found

@@ -1,0 +1,58 @@
+LLM AGENT ANALYSIS SUMMARY
+========================================
+Project path: C:\Users\katew\source\repos\LLM_feature
+Generated at: 2026-04-23T01:19:30.122170
+
+SUMMARY
+--------------------
+Files analyzed: 4
+Total bugs: 12
+Local findings: 10
+Interfile findings: 2
+High severity: 7
+Medium severity: 5
+Low severity: 0
+LLM results: 1
+Fallback results: 3
+Fallback timeouts: 0
+Fallback other errors: 0
+LLM parse errors: 3
+Analysis mode: sequential
+Max workers: 1
+
+COMPARISON
+--------------------
+Previous report: C:\Users\katew\source\repos\LLM_feature\analysis_reports\run_report_20260423_010723.json
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 12
+
+FILES
+--------------------
+File: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Source type: fallback
+Bugs: 5
+  - unsafe-command-execution | severity=high | lines=12-12 | scope=local
+  - external-tool-dependency | severity=medium | lines=31-31 | scope=local
+  - external-tool-dependency | severity=medium | lines=39-39 | scope=local
+  - external-tool-dependency | severity=medium | lines=48-48 | scope=local
+  - weak-error-propagation | severity=medium | lines=66-66 | scope=local
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+Source type: llm
+Bugs: 2
+  - hardcoded-credentials | severity=high | lines=8-8 | scope=local
+  - unsafe-string-copy | severity=high | lines=12-12 | scope=local
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+Source type: fallback
+Bugs: 3
+  - hardcoded-credentials | severity=high | lines=14-14 | scope=local
+  - unsafe-command-execution | severity=high | lines=18-18 | scope=local
+  - manual-allocation-without-visible-release | severity=high | lines=22-22 | scope=interfile
+
+File: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+Source type: fallback
+Bugs: 2
+  - raw-pointer-interface-without-release | severity=high | lines=12-12 | scope=interfile
+  - raw-pointer-field-in-interface | severity=medium | lines=15-15 | scope=local

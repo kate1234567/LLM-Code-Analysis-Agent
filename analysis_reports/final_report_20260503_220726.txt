@@ -1,0 +1,49 @@
+FINAL PROJECT REVIEW REPORT
+============================================================
+Generated at: 2026-05-03T22:07:26.190650
+Project path: C:\Users\katew\source\repos\LLM_feature
+
+1. PROJECT-WIDE CONTEXT
+------------------------------------------------------------
+Graph nodes: 4
+Dependency edges: 4
+Files with reverse dependencies: 0
+Interfile findings: 0
+LLM provider: ollama
+LLM model: deepseek-coder
+
+2. PROJECT SUMMARY
+------------------------------------------------------------
+Files analyzed: 4
+Total findings: 0
+Local findings: 0
+Interfile findings: 0
+LLM results: 0
+Fallback results: 0
+Analysis mode: parallel
+Max workers: 4
+
+3. CHANGED FILES
+------------------------------------------------------------
+- no changed files were passed
+
+4. FILE-LEVEL FINDINGS
+------------------------------------------------------------
+No findings detected.
+5. INTERFILE FINDINGS
+------------------------------------------------------------
+No interfile findings detected.
+6. MODULE ARCHITECTURE FINDINGS
+------------------------------------------------------------
+No architecture-level findings detected.
+
+7. COMPARISON WITH PREVIOUS RUN
+------------------------------------------------------------
+Previous report: C:\Users\katew\source\repos\LLM_feature\analysis_reports\run_report_20260503_215158.json
+New findings: 0
+Resolved findings: 12
+Unchanged findings: 0
+
+8. CONCLUSION
+------------------------------------------------------------
+The project has low detected risk based on the current analysis.

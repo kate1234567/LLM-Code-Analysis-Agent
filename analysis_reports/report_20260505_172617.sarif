@@ -1,0 +1,244 @@
+{
+    "version": "2.1.0",
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "LLM Agent Code Analyzer",
+                    "version": "1.0"
+                }
+            },
+            "results": [
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "error",
+                    "message": {
+                        "text": "hardcoded-credentials"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\main.cpp"
+                                },
+                                "region": {
+                                    "startLine": 8
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "error",
+                    "message": {
+                        "text": "unsafe-string-copy"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\main.cpp"
+                                },
+                                "region": {
+                                    "startLine": 12
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "error",
+                    "message": {
+                        "text": "raw-pointer-interface-without-release"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\utils.h"
+                                },
+                                "region": {
+                                    "startLine": 12
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "warning",
+                    "message": {
+                        "text": "raw-pointer-field-in-interface"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\utils.h"
+                                },
+                                "region": {
+                                    "startLine": 15
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "error",
+                    "message": {
+                        "text": "manual-allocation-without-visible-release"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\utils.cpp"
+                                },
+                                "region": {
+                                    "startLine": 22
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "error",
+                    "message": {
+                        "text": "hardcoded-credentials"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\utils.cpp"
+                                },
+                                "region": {
+                                    "startLine": 14
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "error",
+                    "message": {
+                        "text": "unsafe-command-execution"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\utils.cpp"
+                                },
+                                "region": {
+                                    "startLine": 18
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "error",
+                    "message": {
+                        "text": "unsafe-command-execution"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\LLM.cpp"
+                                },
+                                "region": {
+                                    "startLine": 12
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "warning",
+                    "message": {
+                        "text": "external-tool-dependency"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\LLM.cpp"
+                                },
+                                "region": {
+                                    "startLine": 31
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "warning",
+                    "message": {
+                        "text": "external-tool-dependency"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\LLM.cpp"
+                                },
+                                "region": {
+                                    "startLine": 39
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "warning",
+                    "message": {
+                        "text": "external-tool-dependency"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\LLM.cpp"
+                                },
+                                "region": {
+                                    "startLine": 48
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "LLM.CodeReview",
+                    "level": "warning",
+                    "message": {
+                        "text": "weak-error-propagation"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM_feature\\LLM\\LLM.cpp"
+                                },
+                                "region": {
+                                    "startLine": 66
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

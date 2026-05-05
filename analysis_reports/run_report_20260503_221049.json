@@ -1,0 +1,509 @@
+{
+  "project_id": "768a3ff7-4460-4542-bf28-b683ee60b510",
+  "pr_id": "64ab688e-a443-4d7a-b0de-cd8bd318c8f7",
+  "project_path": "C:\\Users\\katew\\source\\repos\\LLM_feature",
+  "generated_at": "2026-05-03T22:10:49.130813",
+  "changed_files": [],
+  "summary": {
+    "status": "success",
+    "results_count": 4,
+    "total_bugs": 53,
+    "local_findings_count": 49,
+    "interfile_findings_count": 4,
+    "llm_count": 0,
+    "fallback_count": 0,
+    "high_count": 35,
+    "medium_count": 18,
+    "low_count": 0,
+    "paired_header_count": 0,
+    "no_paired_header_count": 4,
+    "related_cpp_count": 0,
+    "no_related_cpp_count": 4,
+    "fallback_timeout_count": 0,
+    "llm_other_error_count": 0,
+    "llm_parse_error_count": 0,
+    "analysis_mode": "parallel",
+    "max_workers": 4,
+    "graph_nodes": 4,
+    "dependency_edges": 4,
+    "files_with_reverse_deps_count": 0,
+    "llm_provider": "ollama",
+    "llm_model": "deepseek-coder",
+    "files_by_language": {
+      "cpp": 4
+    },
+    "deep_analysis_languages": [
+      "cpp",
+      "c"
+    ],
+    "routing_only_languages": []
+  },
+  "results": [
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+      "task_id": null,
+      "result": {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+        "bugs": [
+          {
+            "finding_type": "external-tool-dependency",
+            "description": "Code depends on external command-line tools without explicit availability checks.",
+            "severity": "medium",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "external-tool-dependency",
+            "description": "Code depends on external command-line tools without explicit availability checks.",
+            "severity": "medium",
+            "source_type": "fallback+llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "external-tool-dependency",
+            "description": "Code depends on external command-line tools without explicit availability checks.",
+            "severity": "medium",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "external-tool-dependency",
+            "description": "Code depends on external command-line tools without explicit availability checks.",
+            "severity": "medium",
+            "source_type": null,
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "external-tool-dependency",
+            "description": "Code depends on external command line tools without explicit availability checks.",
+            "severity": "medium",
+            "source_type": "fallback+llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "external-tool-dependency",
+            "description": "Code depends on external command line tools without explicit availability checks.",
+            "severity": "medium",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "external-tool-dependency",
+            "description": "The external tool dependency is not being used correctly. The code uses the filesystem library which has been deprecated in C++17 and later versions.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "external-tool-dependency",
+            "description": "The external tool dependency is not correctly set up in the LLM.cpp file.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "hardcoded-credentials",
+            "description": "Credentials appear directly in code or command strings.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "hardcoded-credentials",
+            "description": "Credentials appear directly in code or command strings.",
+            "severity": "high",
+            "source_type": null,
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "N/A",
+            "description": "The code uses hardcoded credentials in the form of strings, which are not recommended for production use due to security risks and potential misuse by unauthorized users or systems. Hard-coding sensitive information like API keys is a common practice that can lead to serious vulnerabilities such as data breaches if an attacker gains access to your system's resources.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "Avoid raw shell execution when possible. Validate inputs and prefer safer process APIs.",
+            "severity": "medium",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "The `runCommand` function is using system commands which are not safe. It should be replaced with safer alternatives like Boost or Curl for HTTP requests, and Popen/pclose in Windows systems to execute shell scripts instead of running external programs directly from the codebase as it's a security risk if an attacker can control command execution on your machine (e.g., by injecting malicious commands).",
+            "severity": "medium",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "Use of _popen may allow unsafe command execution or command injection.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "Use of _popen may allow unsafe command execution or command injection.",
+            "severity": "high",
+            "source_type": "fallback+llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "Use of _popen may allow unsafe command execution or command injection.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "Use of system or _popen may allow unsafe command execution or command injection.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "Use of system or _popen may allow unsafe command execution or command injection.",
+            "severity": "high",
+            "source_type": null,
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution,",
+            "description": "The command execution is not safe.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "weak-error-propagation",
+            "description": "Errors may be logged but not propagated to caller as failure status.",
+            "severity": "medium",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "weak-error-propagation",
+            "description": "Errors may be logged but not propagated to caller as failure status.",
+            "severity": "medium",
+            "source_type": "fallback+llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "weak-error-propagation",
+            "description": "Errors may be logged but not propagated to caller as failure status.",
+            "severity": "medium",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "weak-error-propagation",
+            "description": "Errors may be logged but not propagated to caller as failure status.",
+            "severity": "medium",
+            "source_type": null,
+            "finding_scope": "local"
+          }
+        ],
+        "cache_skipped": true
+      },
+      "finding_ids": [],
+      "recommendation_ids": [],
+      "source_type": "cache",
+      "has_paired_header": false,
+      "has_related_cpp": false,
+      "reverse_dependencies_count": 0,
+      "project_summary": {}
+    },
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+      "task_id": null,
+      "result": {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+        "bugs": [
+          {
+            "finding_type": "hardcoded-credentials",
+            "description": "Credentials appear directly in code or command strings.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "hardcoded-credentials",
+            "description": "Credentials appear directly in code or command strings.",
+            "severity": "high",
+            "source_type": "fallback+llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "hardcoded-credentials",
+            "description": "Credentials appear directly in code or command strings.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "manual-allocation-behind-raw-pointer-interface",
+            "description": "Implementation performs manual allocation while the paired header exposes raw pointer based interface semantics, which may indicate fragile ownership design.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "manual-allocation-without-visible-release",
+            "description": "Implementation performs manual allocation for an interface exposing raw pointers, but no matching release operation is visible in the implementation.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "interfile"
+          },
+          {
+            "finding_type": "manual-allocation-without-visible-release",
+            "description": "Implementation performs manual allocation for an interface exposing raw pointers, but no matching release operation is visible in the implementation.",
+            "severity": "high",
+            "source_type": "fallback+llm",
+            "finding_scope": "interfile"
+          },
+          {
+            "finding_type": "manual-allocation-without-visible-release",
+            "description": "Implementation performs manual allocation for an interface exposing raw pointers, but no matching release operation is visible in the implementation.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "interfile"
+          },
+          {
+            "finding_type": "manual-memory-management",
+            "description": "malloc in C++ code may lead to unsafe memory management patterns.",
+            "severity": "medium",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "Misuse of `system` function in runCommand method. The system() call is dangerous as it can execute any command passed to the parameter, which could lead into a buffer overflow or other security issue if not properly sanitized and validated inputs are provided by users for this purpose (like user-provided commands).",
+            "description": "`system` function in C++ has been deprecated. It is recommended that you use Popen() instead to execute the command, which provides more robustness against buffer overflows or other security issues due to its usage of fork/exec model and handles signals better than system().",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "CommandRunner's constructor and destructor are not properly initialized.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "The `CommandRunner` class in the utils.cpp file has a system call inside its constructor which could lead to command injection attacks if an attacker can control one of these calls or pass it as part of user input, leading them into executing arbitrary commands on their behalf.",
+            "severity": "medium",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "Use of system may allow unsafe command execution or command injection.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "Use of system may allow unsafe command execution or command injection.",
+            "severity": "high",
+            "source_type": "fallback+llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "Use of system may allow unsafe command execution or command injection.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          }
+        ],
+        "cache_skipped": true
+      },
+      "finding_ids": [],
+      "recommendation_ids": [],
+      "source_type": "cache",
+      "has_paired_header": false,
+      "has_related_cpp": false,
+      "reverse_dependencies_count": 0,
+      "project_summary": {}
+    },
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h",
+      "task_id": null,
+      "result": {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h",
+        "bugs": [
+          {
+            "finding_type": "raw-pointer-field-in-interface",
+            "description": "Header declares a raw pointer field, which may lead to ownership and lifetime issues.",
+            "severity": "medium",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "raw-pointer-interface-with-manual-allocation",
+            "description": "Header exposes raw pointer ownership semantics while the related implementation uses manual allocation, increasing the risk of leaks and unsafe ownership transfer.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "raw-pointer-interface-without-release",
+            "description": "Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "interfile"
+          },
+          {
+            "finding_type": "unsafe-pointer-return-interface",
+            "description": "Header exposes an interface returning raw char pointers, which may lead to unsafe ownership handling.",
+            "severity": "medium",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-string-copy",
+            "description": "The `setPassword` function in the CommandRunner class is using a string literal as an argument to set password. This can lead to security issues if this value could be manipulated by users or maliciously crafted inputs, leading to potential buffer overflows and other vulnerabilities such as command injection attacks (CVE-2014-6275).",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "UNSAFE_POINTERS_IN_COMMANDRUNNER",
+            "description": "The `allocateBuffer` function in the CommandRunner class returns a raw pointer, which may lead to unsafe ownership handling. This could potentially allow for buffer overruns and other issues related to memory management if not properly managed or freed after use by calling system(command). FIX: Ensure that all dynamically allocated buffers are correctly released using `free` function in the destructor of CommandRunner class, SEVERITY: medium",
+            "severity": "medium",
+            "source_type": "llm",
+            "finding_scope": "local"
+          }
+        ],
+        "cache_skipped": true
+      },
+      "finding_ids": [],
+      "recommendation_ids": [],
+      "source_type": "cache",
+      "has_paired_header": false,
+      "has_related_cpp": false,
+      "reverse_dependencies_count": 0,
+      "project_summary": {}
+    },
+    {
+      "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+      "task_id": null,
+      "result": {
+        "file": "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+        "bugs": [
+          {
+            "finding_type": "`CommandRunner` is not declared as a member of the class. This can lead to undefined behavior if it's accessed directly from an instance (CAUSE)",
+            "description": "",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "hardcoded-credentials",
+            "description": "Credentials appear directly in code or command strings.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "hardcoded-credentials",
+            "description": "Credentials appear directly in code or command strings.",
+            "severity": "high",
+            "source_type": "fallback+llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "hardcoded-credentials",
+            "description": "Credentials appear directly in code or command strings.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "Missing Include Statement for iostream and cstring in main.cpp file (Line #1)",
+            "description": "The program is trying to use the 'iostream' library, but it can not find a definition of that symbol at Line 2 (#include <iostream>). Similarly, there are no definitions found for std::cout and cstring in main.cpp file (Lines #3-#5)",
+            "severity": "medium",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "UndefinedBehaviorCommandRunnerSetPasswordUninitializedBufferSizeInAllocateBufferCalledOnNonZeroPointerArgument",
+            "description": "The `allocateBuffer` function is being called on a non-zero pointer argument. This can lead to undefined behavior if the buffer size isn't properly initialized before calling it, which could result in unpredictable output or crashes due to accessing invalid memory locations (SEVERITY=high)",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-command-execution",
+            "description": "The command 'dir' is running on the CommandRunner object. This could potentially lead to unsafe commands execution.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-string-copy",
+            "description": "strcpy may overflow the destination buffer.",
+            "severity": "high",
+            "source_type": "fallback",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-string-copy",
+            "description": "strcpy may overflow the destination buffer.",
+            "severity": "high",
+            "source_type": "fallback+llm",
+            "finding_scope": "local"
+          },
+          {
+            "finding_type": "unsafe-string-copy",
+            "description": "strcpy may overflow the destination buffer.",
+            "severity": "high",
+            "source_type": "llm",
+            "finding_scope": "local"
+          }
+        ],
+        "cache_skipped": true
+      },
+      "finding_ids": [],
+      "recommendation_ids": [],
+      "source_type": "cache",
+      "has_paired_header": false,
+      "has_related_cpp": false,
+      "reverse_dependencies_count": 0,
+      "project_summary": {}
+    }
+  ],
+  "module_reports": [
+    {
+      "module": "LLM",
+      "files_count": 4,
+      "architecture_findings": [
+        {
+          "problem": "Inter-file ownership/lifetime issue",
+          "cause": "Several findings depend on relations between header and implementation files.",
+          "files": [
+            "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+            "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h"
+          ],
+          "severity": "high"
+        }
+      ]
+    }
+  ],
+  "routing_only_files": [],
+  "comparison": {
+    "previous_report_path": "C:\\Users\\katew\\source\\repos\\LLM_feature\\analysis_reports\\run_report_20260503_221002.json",
+    "new_findings_count": 0,
+    "resolved_findings_count": 0,
+    "unchanged_findings_count": 0,
+    "new_findings": [],
+    "resolved_findings": [],
+    "unchanged_findings": []
+  }
+}

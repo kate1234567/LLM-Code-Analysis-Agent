@@ -1,0 +1,50 @@
+LLM AGENT ANALYSIS SUMMARY
+========================================
+Project path: C:\Users\katew\source\repos\LLM_feature
+Generated at: 2026-04-22T23:36:27.965271
+
+SUMMARY
+--------------------
+Files analyzed: 4
+Total bugs: 12
+Local findings: 10
+Interfile findings: 2
+High severity: 7
+Medium severity: 5
+Low severity: 0
+LLM results: 0
+Fallback results: 3
+
+FILES
+--------------------
+FILE: C:\Users\katew\source\repos\LLM_feature\LLM\LLM.cpp
+Source type: fallback
+Paired header: False
+Related cpp: False
+  - [high] unsafe-command-execution (line 12, scope=local)
+  - [medium] external-tool-dependency (line 31, scope=local)
+  - [medium] external-tool-dependency (line 39, scope=local)
+  - [medium] external-tool-dependency (line 48, scope=local)
+  - [medium] weak-error-propagation (line 66, scope=local)
+
+FILE: C:\Users\katew\source\repos\LLM_feature\LLM\main.cpp
+Source type: fallback+llm
+Paired header: False
+Related cpp: False
+  - [high] hardcoded-credentials (line 8, scope=local)
+  - [high] unsafe-string-copy (line 12, scope=local)
+
+FILE: C:\Users\katew\source\repos\LLM_feature\LLM\utils.cpp
+Source type: fallback
+Paired header: True
+Related cpp: False
+  - [high] hardcoded-credentials (line 14, scope=local)
+  - [high] unsafe-command-execution (line 18, scope=local)
+  - [high] manual-allocation-without-visible-release (line 22, scope=interfile)
+
+FILE: C:\Users\katew\source\repos\LLM_feature\LLM\utils.h
+Source type: fallback
+Paired header: False
+Related cpp: True
+  - [high] raw-pointer-interface-without-release (line 12, scope=interfile)
+  - [medium] raw-pointer-field-in-interface (line 15, scope=local)

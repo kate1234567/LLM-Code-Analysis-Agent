@@ -1,0 +1,75 @@
+[
+  {
+    "module": "LLM",
+    "files_count": 4,
+    "header_files_count": 1,
+    "cpp_files_count": 3,
+    "cache_files_count": 4,
+    "llm_files_count": 0,
+    "fallback_files_count": 0,
+    "interfile_findings_count": 2,
+    "high_severity_count": 6,
+    "reverse_dependencies_count": 2,
+    "cross_module_risk_score": 20,
+    "architecture_findings": [
+      {
+        "problem": "Inter-file ownership/lifetime issue",
+        "cause": "Several findings depend on relations between header and implementation files.",
+        "files": [
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h"
+        ],
+        "severity": "high"
+      },
+      {
+        "problem": "Unsafe raw pointer design across module",
+        "cause": "Raw pointers or manual memory management appear in several module files.",
+        "files": [
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h"
+        ],
+        "severity": "high"
+      },
+      {
+        "problem": "Unsafe external command execution",
+        "cause": "The module executes shell/system commands, which may create command injection risks.",
+        "files": [
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp"
+        ],
+        "severity": "high"
+      },
+      {
+        "problem": "Secrets are stored directly in code",
+        "cause": "Credentials or tokens are detected in source files.",
+        "files": [
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp"
+        ],
+        "severity": "high"
+      },
+      {
+        "problem": "Shared header is used by several implementation files",
+        "cause": "The module contains header files connected with several implementation files, so interface changes may affect multiple files.",
+        "files": [
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h"
+        ],
+        "severity": "medium"
+      },
+      {
+        "problem": "Module analysis was fully restored from cache",
+        "cause": "All files in this module were skipped by hash cache, which shows that repeated analysis avoids unnecessary LLM calls.",
+        "files": [
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\LLM.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\main.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.cpp",
+          "C:\\Users\\katew\\source\\repos\\LLM_feature\\LLM\\utils.h"
+        ],
+        "severity": "low"
+      }
+    ]
+  }
+]
