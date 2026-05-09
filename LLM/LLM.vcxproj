@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\tests\unit_tests\tests.cpp" />
     <ClCompile Include="config_loader.cpp" />
     <ClCompile Include="git_utils.cpp" />
     <ClCompile Include="json_exporter.cpp" />
