@@ -1,8 +1,8 @@
 {
   "project_id": "e2e9699c-05bc-406d-9d2a-3cccf6d520d9",
-  "pr_id": "b2f1ddf3-6944-4b81-b1df-4c215622fba9",
+  "pr_id": "d15796d5-40bc-43cb-bdc3-0f70b3df34fc",
   "project_path": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle",
-  "generated_at": "2026-05-08T04:03:02.922149",
+  "generated_at": "2026-05-10T01:20:37.014219",
   "changed_files": [],
   "summary": {
     "status": "success",
@@ -58,13 +58,6 @@
   },
   "results": [
     {
-      "file": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\\main.cpp",
-      "error": "cannot access local variable 'has_raw_pointer_field' where it is not associated with a value",
-      "source_type": "error",
-      "has_paired_header": false,
-      "has_related_cpp": false
-    },
-    {
       "file": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\\user.cpp",
       "error": "cannot access local variable 'has_raw_pointer_field' where it is not associated with a value",
       "source_type": "error",
@@ -72,8 +65,15 @@
       "has_related_cpp": false
     },
     {
+      "file": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\\main.cpp",
+      "error": "cannot access local variable 'has_raw_pointer_field' where it is not associated with a value",
+      "source_type": "error",
+      "has_paired_header": false,
+      "has_related_cpp": false
+    },
+    {
       "file": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\\user.h",
-      "task_id": "f9c4511d-3725-4279-bf3b-754dc1eff10e",
+      "task_id": "4931bc85-3ea8-4bfa-896b-5a5f06bf8a94",
       "result": {
         "file": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\\user.h",
         "bugs": [
@@ -99,11 +99,13 @@
           {
             "bug": "unsafe-pointer-return-interface",
             "cause": "Header exposes an interface returning raw char pointers, which may lead to unsafe ownership handling.",
-            "fix": "Prefer std::string, std::vector<char>, or smart pointer based interfaces.",
+            "fix": "Prefer std::string, std::vector<char> or smart pointer based interfaces for the return type of getName() function in User class. Also consider using unique_ptr instead if possible as it is safer and more efficient than raw pointers when dealing with dynamic memory allocation/deallocation.",
             "severity": "medium",
             "line_start": 9,
             "line_end": 9,
             "finding_scope": "local",
+            "confidence_score": 0.7,
+            "validation_status": "VALIDATED",
             "priority_score": 65,
             "priority_reason": [
               "medium severity",
@@ -111,8 +113,6 @@
               "historical issue",
               "has reverse dependencies"
             ],
-            "confidence_score": 0.7,
-            "validation_status": "VALIDATED",
             "impact_radius": 2
           }
         ],
@@ -125,12 +125,12 @@
         "final_bug_count": 3
       },
       "finding_ids": [
-        "e858942d-ae5d-4a20-9eb7-b724b658ec3e",
-        "cfb49231-e65c-4e92-8171-ed738d691eec"
+        "7b5d03e0-1c07-4498-8b76-0524b84ce978",
+        "0767dcd3-39f8-4f54-8ac1-4f090712b808"
       ],
       "recommendation_ids": [
-        "13517c48-639f-49d5-9131-40eb63f1c491",
-        "74b34d12-ca68-4226-8c57-58eb9bf4a240"
+        "04e1eec6-8328-4ca5-89de-51ebf880754e",
+        "2eaa4fd3-c9fe-4ae9-a166-f244ecff94e9"
       ],
       "source_type": "llm",
       "has_paired_header": false,
@@ -338,10 +338,10 @@
       "ownership_risk_graph"
     ]
   },
-  "dependency_graph_svg": "\n    <svg width=\"100%\" height=\"350\" viewBox=\"0 0 1000 350\"\n         xmlns=\"http://www.w3.org/2000/svg\">\n        <defs>\n            <marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"10\"\n                    refX=\"10\" refY=\"3\" orient=\"auto\">\n                <path d=\"M0,0 L10,3 L0,6 Z\" fill=\"#374151\" />\n            </marker>\n        </defs>\n    \n\n        <rect x=\"80\" y=\"60\" width=\"220\" height=\"50\"\n              rx=\"10\" ry=\"10\"\n              fill=\"#ffffff\"\n              stroke=\"#111827\"\n              stroke-width=\"2\" />\n\n        <text x=\"92\" y=\"90\"\n              font-family=\"Arial\"\n              font-size=\"14\"\n              fill=\"#111827\">\n            main.cpp\n        </text>\n        \n\n        <rect x=\"620\" y=\"150\" width=\"220\" height=\"50\"\n              rx=\"10\" ry=\"10\"\n              fill=\"#ffffff\"\n              stroke=\"#111827\"\n              stroke-width=\"2\" />\n\n        <text x=\"632\" y=\"180\"\n              font-family=\"Arial\"\n              font-size=\"14\"\n              fill=\"#111827\">\n            user.cpp\n        </text>\n        \n\n        <rect x=\"80\" y=\"240\" width=\"220\" height=\"50\"\n              rx=\"10\" ry=\"10\"\n              fill=\"#ffffff\"\n              stroke=\"#111827\"\n              stroke-width=\"2\" />\n\n        <text x=\"92\" y=\"270\"\n              font-family=\"Arial\"\n              font-size=\"14\"\n              fill=\"#111827\">\n            user.h\n        </text>\n        \n</svg>",
+  "dependency_graph_svg": "\n    <svg width=\"100%\" height=\"350\" viewBox=\"0 0 1000 350\"\n         xmlns=\"http://www.w3.org/2000/svg\">\n        <defs>\n            <marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"10\"\n                    refX=\"10\" refY=\"3\" orient=\"auto\">\n                <path d=\"M0,0 L10,3 L0,6 Z\" fill=\"#374151\" />\n            </marker>\n        </defs>\n    \n\n            <line x1=\"300\" y1=\"85\"\n                  x2=\"80\" y2=\"265\"\n                  stroke=\"#374151\"\n                  stroke-width=\"2\"\n                  marker-end=\"url(#arrow)\" />\n            \n\n            <line x1=\"840\" y1=\"175\"\n                  x2=\"80\" y2=\"265\"\n                  stroke=\"#374151\"\n                  stroke-width=\"2\"\n                  marker-end=\"url(#arrow)\" />\n            \n\n        <rect x=\"80\" y=\"60\" width=\"220\" height=\"50\"\n              rx=\"10\" ry=\"10\"\n              fill=\"#ffffff\"\n              stroke=\"#111827\"\n              stroke-width=\"2\" />\n\n        <text x=\"92\" y=\"90\"\n              font-family=\"Arial\"\n              font-size=\"14\"\n              fill=\"#111827\">\n            main.cpp\n        </text>\n        \n\n        <rect x=\"620\" y=\"150\" width=\"220\" height=\"50\"\n              rx=\"10\" ry=\"10\"\n              fill=\"#ffffff\"\n              stroke=\"#111827\"\n              stroke-width=\"2\" />\n\n        <text x=\"632\" y=\"180\"\n              font-family=\"Arial\"\n              font-size=\"14\"\n              fill=\"#111827\">\n            user.cpp\n        </text>\n        \n\n        <rect x=\"80\" y=\"240\" width=\"220\" height=\"50\"\n              rx=\"10\" ry=\"10\"\n              fill=\"#ffffff\"\n              stroke=\"#111827\"\n              stroke-width=\"2\" />\n\n        <text x=\"92\" y=\"270\"\n              font-family=\"Arial\"\n              font-size=\"14\"\n              fill=\"#111827\">\n            user.h\n        </text>\n        \n</svg>",
   "routing_only_files": [],
   "comparison": {
-    "previous_report_path": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\\analysis_reports\\run_report_20260507_203100.json",
+    "previous_report_path": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\\analysis_reports\\run_report_20260510_011859.json",
     "new_findings_count": 0,
     "resolved_findings_count": 0,
     "unchanged_findings_count": 2,

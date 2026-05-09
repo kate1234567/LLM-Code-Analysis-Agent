@@ -130,6 +130,36 @@
     </p>
 </div>
 <div class="module-card">
+    <h2>Final Merge Decision</h2>
+
+    <p>
+        <b>Merge Status:</b>
+        <span class="risk-high">
+        NOT RECOMMENDED
+        </span>
+    </p>
+
+    <p>
+        <b>Confidence Score:</b>
+        0.95
+    </p>
+
+    <p>
+        <b>Estimated Fix Complexity:</b>
+        Medium
+    </p>
+
+    <p>
+        <b>Estimated Fix Time:</b>
+        2–4 hours
+    </p>
+
+    <p>
+        <b>Reason:</b><br>
+        Detected 1 high severity issue(s) and 1 interfile risk(s). These findings may cause memory leaks, ownership issues or unsafe runtime behavior.
+    </p>
+</div>
+<div class="module-card">
     <h2>Top Immediate Actions</h2>
 
     <ol>
@@ -170,7 +200,32 @@
         or introduce explicit safe cleanup strategy.
     </p>
 </div>
-    <p class="small">Generated at: 2026-05-08T04:03:02.922149</p>
+<div class="module-card">
+    <h2>Why LLM Was Required</h2>
+
+    <p>
+        Traditional static analysis tools and regex-based
+        rules cannot reliably detect ownership ambiguity
+        across header and implementation files.
+    </p>
+
+    <p>
+        This issue requires semantic reasoning about:
+    </p>
+
+    <ul>
+        <li>resource ownership transfer</li>
+        <li>constructor/destructor lifecycle</li>
+        <li>hidden memory release paths</li>
+        <li>cross-file allocation/deallocation consistency</li>
+    </ul>
+
+    <p>
+        LLM validation was used to perform this
+        semantic cross-file reasoning.
+    </p>
+</div>
+    <p class="small">Generated at: 2026-05-10T01:20:37.014219</p>
     <p class="small">Project path: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle</p>
 
     <h2>Project Summary</h2>
@@ -257,6 +312,20 @@
         </defs>
     
 
+            <line x1="300" y1="85"
+                  x2="80" y2="265"
+                  stroke="#374151"
+                  stroke-width="2"
+                  marker-end="url(#arrow)" />
+            
+
+            <line x1="840" y1="175"
+                  x2="80" y2="265"
+                  stroke="#374151"
+                  stroke-width="2"
+                  marker-end="url(#arrow)" />
+            
+
         <rect x="80" y="60" width="220" height="50"
               rx="10" ry="10"
               fill="#ffffff"
@@ -338,10 +407,10 @@
     </div>
 
     <div class="card">
-        <div class="card-title">Raw pointer fields</div>
-        <div class="card-value risk-high">
-            0
-        </div>
+        <div class="card-title">Unsafe Ownership Interfaces</div>
+            <div class="card-value risk-high">
+            2
+            </div>
     </div>
 </div>
 
@@ -352,9 +421,10 @@
             <p>
                 <b>Classes:</b> 0<br>
                 <b>Functions:</b> 1<br>
-                <b>Raw pointer fields:</b>
+                <b>Unsafe Ownership Interfaces:</b>
                 <span class="risk-high">
                     0
+                    (AST + findings)
                 </span>
             </p>
 
@@ -369,9 +439,10 @@
             <p>
                 <b>Classes:</b> 0<br>
                 <b>Functions:</b> 1<br>
-                <b>Raw pointer fields:</b>
+                <b>Unsafe Ownership Interfaces:</b>
                 <span class="risk-high">
                     0
+                    (AST + findings)
                 </span>
             </p>
 
@@ -386,9 +457,10 @@
             <p>
                 <b>Classes:</b> 1<br>
                 <b>Functions:</b> 0<br>
-                <b>Raw pointer fields:</b>
+                <b>Unsafe Ownership Interfaces:</b>
                 <span class="risk-high">
-                    0
+                    2
+                    (AST + findings)
                 </span>
             </p>
 
@@ -431,6 +503,29 @@
 
     <p>
         This is the key advantage of the proposed LLM-agent approach.
+    </p>
+</div>
+<div class="module-card">
+    <h2>System Advantage Over Classic Static Analyzers</h2>
+
+    <p>
+        Classic static analyzers usually work on isolated files
+        and local syntax patterns.
+    </p>
+
+    <p>
+        The proposed LLM-agent builds a project-wide dependency graph,
+        analyzes reverse dependencies, tracks pull request changes,
+        and performs interfile semantic validation.
+    </p>
+
+    <p>
+        This allows detection of risks that are invisible
+        for isolated local analysis.
+    </p>
+
+    <p>
+        This is the core novelty of the proposed system.
     </p>
 </div>
 
@@ -566,7 +661,7 @@
             <td>user.h</td>
             <td>9-9</td>
             <td>Header exposes an interface returning raw char pointers, which may lead to unsafe ownership handling.</td>
-            <td>Prefer std::string, std::vector&lt;char&gt;, or smart pointer based interfaces.</td>
+            <td>Prefer std::string, std::vector&lt;char&gt; or smart pointer based interfaces for the return type of getName() function in User class. Also consider using unique_ptr instead if possible as it is safer and more efficient than raw pointers when dealing with dynamic memory allocation/deallocation.</td>
         </tr>
         
         </tbody>
@@ -686,61 +781,56 @@
         
     <p>
         Previous report:
-        C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\analysis_reports\run_report_20260507_203100.json
+        C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\analysis_reports\run_report_20260510_011859.json
     </p>
     
         <p>New findings: 0</p>
         <p>Resolved findings: 0</p>
         <p>Unchanged findings: 2</p>
     </div>
+    
+<div class="module-card">
+    <h2>Evaluation Metrics</h2>
+
+    <p>
+        The system quality was evaluated using
+        precision, recall and F1-score metrics
+        on manually validated ground-truth findings.
+    </p>
+
+    <p>
+        <b>Ground Truth Bugs:</b> 3<br>
+        <b>Detected:</b> 2<br>
+        <b>True Positive:</b> 2<br>
+        <b>False Positive:</b> 0<br>
+        <b>False Negative:</b> 1
+    </p>
+
+    <p>
+        <b>Precision:</b> 100%<br>
+        <b>Recall:</b> 66.7%<br>
+        <b>F1-score:</b> 80%
+    </p>
+</div>
+    
+<div class="module-card">
     <h2>Unchanged Findings Evolution</h2>
 
-<div class="card">
-    <table>
-        <thead>
-            <tr>
-                <th>File</th>
-                <th>Bug</th>
-                <th>Lines</th>
-                <th>Scope</th>
-                <th>Severity</th>
-                <th>Changes</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-                    <tr>
-                        <td>tests/test_cpp_lifecycle/user.h</td>
-                        <td>raw-pointer-interface-without-release</td>
-                        <td>5-5</td>
-                        <td>interfile</td>
-                        <td>
-                            <span class="severity-high">
-                                HIGH
-                            </span>
-                        </td>
-                        <td>
-                            none
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td>tests/test_cpp_lifecycle/user.h</td>
-                        <td>unsafe-pointer-return-interface</td>
-                        <td>9-9</td>
-                        <td>local</td>
-                        <td>
-                            <span class="severity-medium">
-                                MEDIUM
-                            </span>
-                        </td>
-                        <td>
-                            none
-                        </td>
-                    </tr>
-                    
-        </tbody>
-    </table>
+    <p>
+        Previous analysis detected and comparison
+        with historical findings is available.
+    </p>
+
+    <p>
+        <b>Unchanged findings:</b>
+        2
+    </p>
+
+    <p>
+        Stable recurring issues indicate architectural
+        risks and should be prioritized for refactoring.
+    </p>
 </div>
+
 </body>
 </html>
