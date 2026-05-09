@@ -1,0 +1,86 @@
+FINAL PROJECT REVIEW REPORT
+============================================================
+Generated at: 2026-05-08T04:21:40.609668
+Project path: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle
+
+1. PROJECT-WIDE CONTEXT
+------------------------------------------------------------
+Graph nodes: 3
+Dependency edges: 4
+Files with reverse dependencies: 1
+Interfile findings: 1
+LLM provider: auto
+LLM model: deepseek-coder
+
+2. PROJECT SUMMARY
+------------------------------------------------------------
+Files analyzed: 3
+Total findings: 2
+Local findings: 1
+Interfile findings: 1
+LLM results: 1
+Fallback results: 0
+Analysis mode: full
+Max workers: 3
+
+3. CHANGED FILES
+------------------------------------------------------------
+- no changed files were passed
+
+4. FILE-LEVEL FINDINGS
+------------------------------------------------------------
+1. [HIGH] raw-pointer-interface-without-release
+   File: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\user.h
+   Lines: 5-5
+   Scope: interfile
+   Cause: Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.
+   Fix: Add explicit safe cleanup logic or replace the interface and implementation with RAII-based ownership.
+
+2. [MEDIUM] unsafe-pointer-return-interface
+   File: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\user.h
+   Lines: 9-9
+   Scope: local
+   Cause: Header exposes an interface returning raw char pointers, which may lead to unsafe ownership handling.
+   Fix: Prefer std::string, std::vector<char>, or smart pointer based interfaces.
+
+5. INTERFILE FINDINGS
+------------------------------------------------------------
+1. [HIGH] raw-pointer-interface-without-release
+   File: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\user.h
+   Lines: 5-5
+   Cause: Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.
+   Fix: Add explicit safe cleanup logic or replace the interface and implementation with RAII-based ownership.
+
+6. MODULE ARCHITECTURE FINDINGS
+------------------------------------------------------------
+Module: test_cpp_lifecycle
+  - [HIGH] Inter-file dependency risk
+    Cause: Some findings depend on relationships between files, modules or imports.
+    Files: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\user.h
+  - [HIGH] Manual memory or ownership risk
+    Cause: The module contains pointer, allocation or manual memory management findings.
+    Files: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\user.h
+
+
+7. COMPARISON WITH PREVIOUS RUN
+------------------------------------------------------------
+Previous report: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\analysis_reports\run_report_20260508_040302.json
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 2
+
+
+8. EVALUATION METRICS
+------------------------------------------------------------
+Ground truth bugs: 3
+Detected by agent: 2
+True positive: 0
+False positive: 2
+False negative: 3
+Precision: 0.0%
+Recall: 0.0%
+F1-score: 0%
+
+9. CONCLUSION
+------------------------------------------------------------
+The project contains high-risk findings. Manual review is recommended before merging.

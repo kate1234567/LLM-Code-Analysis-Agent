@@ -123,7 +123,7 @@ def parse_args():
         "--mode",
         type=str,
         default="full",
-        choices=["fast", "full"],
+        choices=["fast", "full", "fallback_only", "graph_only"],
         help="Analysis mode"
     )
 
@@ -209,10 +209,18 @@ def find_impacted_cpp_files_by_headers(changed_header_files, graph, all_cpp_file
         includes = node.get("includes", []) if isinstance(node, dict) else []
 
         for inc in includes:
-            inc_name = os.path.basename(inc).lower().replace("\\", "/")
-            if inc_name in changed_header_names:
-                impacted.add(cpp_file)
-                break
+            inc_normalized = inc.replace("\\", "/").lower()
+
+            candidates = [
+                os.path.basename(inc_normalized),
+                inc_normalized.split("/")[-1],
+                os.path.splitext(os.path.basename(inc_normalized))[0]
+            ]
+
+            for changed_header in changed_header_names:
+                if changed_header in candidates:
+                    impacted.add(cpp_file)
+                    break
 
     return sorted(impacted)
 
@@ -325,6 +333,7 @@ def process_code_file(
     context_map,
     graph,
     changed_files,
+    analysis_mode="full",
     force_reanalyze=False
 ):
     conn = get_connection()
@@ -342,13 +351,46 @@ def process_code_file(
             print("LANGUAGE:", detected_language)
 
             try:
+                selected_context = build_selected_context(
+                    target_file=target_file,
+                    context_map=context_map,
+                    graph=graph
+                )
+
+                reverse_dependencies = selected_context.get(
+                    "reverse_dependencies",
+                    []
+                )
+
+                project_summary = selected_context.get(
+                    "project_summary",
+                    {}
+                )
+
+                symbols = selected_context.get(
+                    "symbols",
+                    {
+                        "classes": [],
+                        "structs": [],
+                        "functions": []
+                    }
+                )
+
+                print(
+                    "REVERSE DEPENDENCIES COUNT:",
+                    len(reverse_dependencies)
+                )
+
+                print(
+                    "PROJECT SUMMARY:",
+                    project_summary
+                )
                 with open(target_file, "r", encoding="utf-8", errors="ignore") as f:
                     file_code = f.read()
 
                 lightweight_result = detect_lightweight_findings(
-                    file_path=target_file,
-                    file_code=file_code,
-                    language=detected_language
+                    target_file,
+                    file_code
                 )
 
                 parsed = {
@@ -390,8 +432,10 @@ def process_code_file(
                     "source_type": "lightweight",
                     "has_paired_header": False,
                     "has_related_cpp": False,
-                    "reverse_dependencies_count": 0,
-                    "project_summary": {}
+                    "reverse_dependencies_count": len(reverse_dependencies),
+                    "project_summary": project_summary,
+                    "file_code": file_code,
+                    "symbols": symbols
                 }
 
             except Exception as e:
@@ -486,7 +530,9 @@ def process_code_file(
                     "has_paired_header": has_paired_header,
                     "has_related_cpp": has_related_cpp,
                     "reverse_dependencies_count": len(reverse_dependencies),
-                    "project_summary": project_summary
+                    "project_summary": project_summary,
+                    "file_code": file_code,
+                    "symbols": symbols
                 }
 
             print("HASH FOUND, BUT ANALYSIS CACHE IS EMPTY. REANALYZING:", target_file)
@@ -504,15 +550,22 @@ def process_code_file(
             context_map=context_map,
             graph=graph
         )
-
-        file_code = selected_context.get("file_code", "")
         diff_text = selected_context.get("diff", "")
-        symbols = selected_context.get("symbols", {})
         dependencies = selected_context.get("direct_dependencies", [])
         paired_header = selected_context.get("paired_header", {})
         related_cpp = selected_context.get("related_cpp", {})
         reverse_dependencies = selected_context.get("reverse_dependencies", [])
         project_summary = selected_context.get("project_summary", {})
+        file_code = selected_context.get("file_code", "")
+
+        symbols = selected_context.get(
+            "symbols",
+            {
+                "classes": [],
+                "structs": [],
+                "functions": []
+            }
+        )
         print("REVERSE DEPENDENCIES COUNT:", len(reverse_dependencies))
         print("PROJECT SUMMARY:", project_summary)
 
@@ -545,7 +598,8 @@ def process_code_file(
             file_kind,
             historical_findings,
             reverse_dependencies,
-            project_summary
+            project_summary,
+            analysis_mode=analysis_mode
         )
         subagent_duration = int((time.time() - subagent_start) * 1000)
 
@@ -660,7 +714,9 @@ def process_code_file(
             "has_paired_header": has_paired_header,
             "has_related_cpp": has_related_cpp,
             "reverse_dependencies_count": len(reverse_dependencies),
-            "project_summary": project_summary
+            "project_summary": project_summary,
+            "file_code": file_code,
+            "symbols": symbols
         }
 
     except Exception as e:
@@ -1139,9 +1195,13 @@ def run_project(
         print("\n[3] LOADING PROJECT CONTEXT FROM JSON...")
         context_start = time.time()
 
-        raw_json_text = load_raw_json_text(JSON_CONTEXT_PATH)
+        json_context_path = JSON_CONTEXT_PATH
+
+        print("USING JSON CONTEXT:", json_context_path)
+
+        raw_json_text = load_raw_json_text(json_context_path)
         raw_json_data = json.loads(raw_json_text)
-        context_map = load_context_from_json(JSON_CONTEXT_PATH)
+        context_map = load_context_from_json(json_context_path)
 
         function_graph = build_function_call_graph(context_map)
 
@@ -1217,7 +1277,7 @@ def run_project(
 
         save_log_metric(project_id, pr_id, "context_loader", "finish", {
             "context_nodes": len(context_map),
-            "json_path": JSON_CONTEXT_PATH
+            "json_path": json_context_path
         }, context_duration, conn=conn)
 
         analysis_files = []
@@ -1253,9 +1313,31 @@ def run_project(
             for f in analysis_files:
                 print(" -", f)
 
+        elif analysis_mode == "fallback_only":
+            print("\nFALLBACK ONLY MODE")
+
+            analysis_files = sorted(
+                deep_supported_files + lightweight_supported_files
+            )
+
+            os.environ["LLM_PROVIDER"] = "mock"
+
+            for f in analysis_files:
+                print(" -", f)
+
+        elif analysis_mode == "graph_only":
+            print("\nGRAPH ONLY MODE")
+
+            analysis_files = sorted(
+                deep_supported_files + lightweight_supported_files
+            )
+
+            os.environ["LLM_PROVIDER"] = "mock"
+
+            for f in analysis_files:
+                print(" -", f)
 
         else:
-
             print("\nFULL PROJECT MODE: using all code files")
 
             analysis_files = sorted(
@@ -1287,6 +1369,7 @@ def run_project(
                     context_map,
                     graph,
                     changed_files,
+                    analysis_mode,
                     args.force_reanalyze
                 )
                 for target_file in analysis_files
@@ -1359,12 +1442,21 @@ def run_project(
             if fallback_used:
                 fallback_count += 1
 
-                lowered_reason = fallback_reason.lower()
+                lowered_reason = (fallback_reason or "").lower()
 
                 if "timed out" in lowered_reason:
                     fallback_timeout_count += 1
+
                 elif fallback_reason == "llm_parse_error":
                     llm_parse_error_count += 1
+
+                elif fallback_reason in {
+                    "fallback_only_mode",
+                    "graph_only_mode",
+                    "lightweight_language_analysis"
+                }:
+                    pass
+
                 elif fallback_reason:
                     llm_other_error_count += 1
 

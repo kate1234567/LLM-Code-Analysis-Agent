@@ -57,6 +57,59 @@ def find_first_matching_line(lines, pattern):
             return idx
     return None
 
+def analyze_cpp_lifecycle_risks(file_path, file_code):
+    findings = []
+    lines = file_code.splitlines()
+    text = file_code.lower()
+
+    has_new = re.search(r"\bnew\s+", text) is not None
+    has_delete = re.search(r"\bdelete\b", text) is not None
+
+    has_malloc = re.search(r"\bmalloc\s*\(", text) is not None
+    has_free = re.search(r"\bfree\s*\(", text) is not None
+
+    if has_new and not has_delete:
+        line_number = find_first_matching_line(lines, r"\bnew\s+")
+        findings.append(make_lightweight_bug(
+            "memory-leak-new-without-delete",
+            "high",
+            "The file allocates memory with new, but no matching delete is visible in the same file.",
+            "Use std::unique_ptr/std::shared_ptr or add deterministic cleanup.",
+            line_number
+        ))
+
+    if has_malloc and not has_free:
+        line_number = find_first_matching_line(lines, r"\bmalloc\s*\(")
+        findings.append(make_lightweight_bug(
+            "memory-leak-malloc-without-free",
+            "high",
+            "The file allocates memory with malloc, but no matching free is visible in the same file.",
+            "Use RAII wrappers or ensure free() is called on all execution paths.",
+            line_number
+        ))
+
+    for i, line in enumerate(lines, 1):
+        l = line.lower()
+
+        if "->" in l and ("nullptr" in l or "null" in l):
+            findings.append(make_lightweight_bug(
+                "possible-null-dereference",
+                "high",
+                "Pointer may be dereferenced after null/nullptr usage.",
+                "Check pointer validity before dereference.",
+                i
+            ))
+
+        if "return" in l and "*" in l and ("new " in l or "malloc(" in l):
+            findings.append(make_lightweight_bug(
+                "ownership-transfer-risk",
+                "high",
+                "Function returns manually allocated memory, making ownership unclear for the caller.",
+                "Return RAII-managed objects such as std::unique_ptr or value types.",
+                i
+            ))
+
+    return findings
 
 def run_fallback_analysis(
     file_path,
@@ -66,6 +119,15 @@ def run_fallback_analysis(
     related_cpp_code=""
 ):
     bugs = []
+
+    lightweight_findings = detect_lightweight_findings(
+        file_path,
+        file_code
+    )
+
+    for bug in lightweight_findings:
+        bugs.append(bug)
+
     changed_lines = parse_changed_lines(diff_text)
     seen = set()
 
@@ -142,6 +204,34 @@ def run_fallback_analysis(
             "cause": "gets is unsafe and may cause buffer overflow.",
             "fix": "Use safer input functions.",
             "severity": "high"
+        },
+        {
+            "pattern": r"\bnew\s+",
+            "bug": "possible-memory-leak",
+            "cause": "Dynamic allocation detected without guaranteed ownership-safe cleanup, which may lead to memory leaks.",
+            "fix": "Use std::unique_ptr, std::shared_ptr, RAII wrappers, or ensure deterministic delete logic.",
+            "severity": "high"
+        },
+        {
+            "pattern": r"\bmalloc\s*\(",
+            "bug": "possible-memory-leak",
+            "cause": "Manual heap allocation via malloc may lead to memory leaks if release is not guaranteed.",
+            "fix": "Prefer RAII abstractions or ensure matching free() on all execution paths.",
+            "severity": "high"
+        },
+        {
+            "pattern": r"nullptr.*->|NULL.*->",
+            "bug": "possible-null-dereference",
+            "cause": "Pointer dereference after nullptr/NULL usage may cause runtime crashes.",
+            "fix": "Validate pointer before dereference and avoid unsafe null access.",
+            "severity": "high"
+        },
+        {
+            "pattern": r"\bfopen\s*\(",
+            "bug": "missing-raii-resource-management",
+            "cause": "Manual FILE* resource management may cause leaks if fclose is missed.",
+            "fix": "Prefer std::ifstream/std::ofstream or RAII wrappers.",
+            "severity": "medium"
         }
     ]
 
@@ -161,6 +251,34 @@ def run_fallback_analysis(
             "severity": "medium"
         }
     ]
+
+    if header_mode:
+        has_raw_pointer_field = any(
+            re.search(r"\bchar\s*\*\s*[A-Za-z_]\w*\s*;", line)
+            for line in lines
+        )
+
+    has_destructor_decl = any(
+        re.search(r"~[A-Za-z_]\w*\s*\(", line)
+        for line in lines
+    )
+
+    if has_raw_pointer_field and not has_destructor_decl:
+        bugs.append({
+            "bug": "missing-destructor-for-owned-resource",
+            "cause": "Class owns raw pointer fields but does not declare a destructor, which may indicate broken ownership lifecycle management.",
+            "fix": "Declare destructor or replace raw ownership with RAII-safe abstractions such as std::string or std::unique_ptr.",
+            "severity": "high",
+            "line_start": find_first_matching_line(
+                lines,
+                r"\bchar\s*\*\s*[A-Za-z_]\w*\s*;"
+            ),
+            "line_end": find_first_matching_line(
+                lines,
+                r"\bchar\s*\*\s*[A-Za-z_]\w*\s*;"
+            ),
+            "finding_scope": "interfile"
+        })
 
     checks = list(common_checks)
     if header_mode:
@@ -379,6 +497,51 @@ def analyze_python(code):
                 i
             ))
 
+        if "except:" in l:
+            findings.append(make_lightweight_bug(
+                "broad-exception-handling",
+                "medium",
+                "Bare except may hide critical errors.",
+                "Catch specific exceptions instead of using bare except.",
+                i
+            ))
+
+        if "pickle.loads(" in l or "pickle.load(" in l:
+            findings.append(make_lightweight_bug(
+                "unsafe-deserialization",
+                "high",
+                "pickle deserialization may execute arbitrary code.",
+                "Avoid untrusted pickle deserialization.",
+                i
+            ))
+
+        if "requests.get(" in l and "timeout=" not in l:
+            findings.append(make_lightweight_bug(
+                "missing-timeout",
+                "medium",
+                "HTTP request without timeout may hang indefinitely.",
+                "Specify timeout= in requests calls.",
+                i
+            ))
+
+        if "subprocess.run(" in l and "shell=true" in l:
+            findings.append(make_lightweight_bug(
+                "unsafe-subprocess-shell",
+                "high",
+                "shell=True may allow command injection.",
+                "Avoid shell=True and validate input.",
+                i
+            ))
+
+        if "cursor.execute(" in l and "%" in l:
+            findings.append(make_lightweight_bug(
+                "possible-sql-injection",
+                "high",
+                "String-formatted SQL may lead to injection.",
+                "Use parameterized SQL queries.",
+                i
+            ))
+
     return findings
 
 
@@ -444,19 +607,157 @@ def analyze_javascript(code):
                 i
             ))
 
+        if "child_process.exec(" in l:
+            findings.append(make_lightweight_bug(
+                "unsafe-command-execution",
+                "high",
+                "child_process.exec may execute unsafe commands.",
+                "Avoid raw command execution.",
+                i
+            ))
+
+        if "localstorage.setitem(" in l and "token" in l:
+            findings.append(make_lightweight_bug(
+                "token-storage-risk",
+                "medium",
+                "Sensitive token stored in localStorage may be stolen via XSS.",
+                "Prefer HttpOnly cookies or safer storage.",
+                i
+            ))
+
+        if "md5" in l:
+            findings.append(make_lightweight_bug(
+                "weak-crypto",
+                "medium",
+                "MD5 is considered cryptographically weak.",
+                "Use stronger hashing like SHA-256 or bcrypt.",
+                i
+            ))
+
     return findings
 
-
-def detect_lightweight_findings(file_path, file_code):
+def analyze_cross_file_risk(file_path, file_code):
+    findings = []
+    lines = file_code.splitlines()
     ext = os.path.splitext(file_path)[1].lower()
 
+    imported_modules = []
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+
+        if ext == ".py":
+            m1 = re.match(r"import\s+([A-Za-z_][\w\.]*)", stripped)
+            m2 = re.match(r"from\s+([A-Za-z_][\w\.]*)\s+import", stripped)
+
+            if m1:
+                imported_modules.append((m1.group(1), i))
+
+            if m2:
+                imported_modules.append((m2.group(1), i))
+
+        elif ext in [".js", ".ts"]:
+            m1 = re.search(r"from\s+[\"']([^\"']+)[\"']", stripped)
+            m2 = re.search(r"require\s*\(\s*[\"']([^\"']+)[\"']\s*\)", stripped)
+
+            if m1:
+                imported_modules.append((m1.group(1), i))
+
+            if m2:
+                imported_modules.append((m2.group(1), i))
+
+    dangerous_modules = {
+        "subprocess",
+        "os",
+        "sys",
+        "pickle",
+        "child_process",
+        "fs",
+        "crypto"
+    }
+
+    for module_name, line_number in imported_modules:
+        short_name = module_name.split(".")[-1].replace("./", "").replace("../", "")
+
+        if short_name in dangerous_modules:
+            findings.append(make_lightweight_bug(
+                "dangerous-dependency-import",
+                "medium",
+                f"Import of risky dependency detected: {module_name}",
+                "Validate usage of this dependency and restrict dangerous operations.",
+                line_number
+            ))
+
+            findings[-1]["finding_scope"] = "interfile"
+
+    return findings
+
+def detect_lightweight_findings(
+    file_path,
+    file_code,
+    imported_modules_context=None
+):
+    ext = os.path.splitext(file_path)[1].lower()
+
+    findings = []
+
     if ext == ".py":
-        return analyze_python(file_code)
+        findings.extend(analyze_python(file_code))
 
-    if ext == ".java":
-        return analyze_java(file_code)
+    elif ext == ".java":
+        findings.extend(analyze_java(file_code))
 
-    if ext in [".js", ".ts"]:
-        return analyze_javascript(file_code)
+    elif ext in [".js", ".ts"]:
+        findings.extend(analyze_javascript(file_code))
 
-    return []
+    findings.extend(
+        analyze_cross_file_risk(
+            file_path,
+            file_code
+        )
+    )
+
+    if imported_modules_context is None:
+        imported_modules_context = []
+
+    for imported in imported_modules_context:
+        imported_code = imported.get("code", "").lower()
+        imported_path = imported.get("path", "")
+
+        dangerous_markers = [
+            "secret_key",
+            "api_key",
+            "password",
+            "token",
+            "debug = true",
+            "debug=true"
+        ]
+
+        for marker in dangerous_markers:
+            if marker in imported_code:
+                findings.append({
+                    "bug": "shared-sensitive-config-across-files",
+                    "severity": "high",
+                    "cause": (
+                        f"Imported module contains sensitive configuration "
+                        f"or insecure debug setting: {marker}"
+                    ),
+                    "fix": (
+                        "Move secrets to protected configuration "
+                        "and disable debug mode in production."
+                    ),
+                    "line_start": 1,
+                    "line_end": 1,
+                    "finding_scope": "interfile"
+                })
+                break
+
+    if ext in [".cpp", ".cc", ".cxx", ".c", ".h", ".hpp"]:
+        findings.extend(
+            analyze_cpp_lifecycle_risks(
+                file_path,
+                file_code
+            )
+        )
+
+    return findings

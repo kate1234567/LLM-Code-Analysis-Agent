@@ -1,0 +1,33 @@
+[
+  {
+    "module": "test_multilanguage_graph",
+    "files_count": 3,
+    "header_files_count": 0,
+    "cpp_files_count": 0,
+    "cache_files_count": 0,
+    "llm_files_count": 0,
+    "fallback_files_count": 0,
+    "interfile_findings_count": 2,
+    "high_severity_count": 4,
+    "reverse_dependencies_count": 0,
+    "cross_module_risk_score": 14,
+    "architecture_findings": [
+      {
+        "problem": "Inter-file ownership/lifetime issue",
+        "cause": "Several findings depend on relations between header and implementation files.",
+        "files": [
+          "C:/Users/katew/source/repos/LLM/tests/test_multilanguage_graph\\main.py"
+        ],
+        "severity": "high"
+      },
+      {
+        "problem": "Secrets are stored directly in code",
+        "cause": "Credentials or tokens are detected in source files.",
+        "files": [
+          "C:/Users/katew/source/repos/LLM/tests/test_multilanguage_graph\\main.py"
+        ],
+        "severity": "high"
+      }
+    ]
+  }
+]

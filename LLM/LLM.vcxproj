@@ -135,7 +135,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="config_loader.cpp" />
+    <ClCompile Include="git_utils.cpp" />
+    <ClCompile Include="json_exporter.cpp" />
     <ClCompile Include="LLM.cpp" />
+    <ClCompile Include="scanner.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="config_loader.h" />
+    <ClInclude Include="git_utils.h" />
+    <ClInclude Include="json_exporter.h" />
+    <ClInclude Include="scanner.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

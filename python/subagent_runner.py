@@ -29,6 +29,13 @@ ALLOWED_BUG_NAMES = {
     "external-tool-dependency",
     "manual-memory-management",
     "manual-allocation-without-visible-release",
+    "unsafe-dynamic-execution",
+    "unsafe-dom-manipulation",
+    "unsafe-string-concatenation",
+    "unsafe-input",
+    "missing-destructor-for-raw-pointer-field",
+    "raw-pointer-interface-with-manual-allocation",
+    "manual-allocation-behind-raw-pointer-interface",
 }
 
 SCOPE_RANK = {
@@ -517,7 +524,7 @@ def build_rewrite_prompt(
     candidate_json = json.dumps(candidate_bug, ensure_ascii=False, indent=2)
 
     return f"""
-You are a strict C++ review formatter.
+You are a strict multi-language code review formatter.
 
 You MUST NOT invent new bugs.
 You MUST ONLY rewrite the provided candidate bug.
@@ -888,6 +895,7 @@ def run_subagent(
     historical_findings: Optional[List[Dict[str, Any]]] = None,
     reverse_dependencies: Optional[List[Dict[str, Any]]] = None,
     project_summary: Optional[Dict[str, Any]] = None,
+    analysis_mode: str = "full",
 ) -> Dict[str, Any]:
     use_dependencies = should_use_dependencies(file_kind, dependencies, diff_text)
     use_history = should_use_history(file_path, historical_findings)
@@ -922,6 +930,58 @@ def run_subagent(
         historical_findings=historical_findings,
         reverse_dependencies=reverse_dependencies
     )
+
+    provider = os.getenv("LLM_PROVIDER", "ollama")
+
+    if analysis_mode == "graph_only":
+        final_bugs = []
+
+        for bug in candidate_bugs:
+            scope = bug.get("finding_scope", "local")
+
+            if (
+                    scope == "interfile"
+                    or reverse_dependencies
+                    or paired_header
+                    or related_cpp
+            ):
+                bug["finding_scope"] = "interfile"
+
+                if bug.get("severity") == "medium":
+                    bug["severity"] = "high"
+
+                final_bugs.append(bug)
+
+        return {
+            "file": file_path,
+            "result": {
+                "file": file_path,
+                "bugs": final_bugs,
+                "fallback_used": True,
+                "fallback_reason": "graph_only_mode",
+                "llm_rewrite_used": False,
+                "llm_rewrite_error": None,
+                "candidate_count": len(candidate_bugs),
+                "llm_candidate_count": 0,
+                "final_bug_count": len(final_bugs),
+            },
+        }
+
+    if analysis_mode == "fallback_only":
+        return {
+            "file": file_path,
+            "result": {
+                "file": file_path,
+                "bugs": candidate_bugs,
+                "fallback_used": True,
+                "fallback_reason": "fallback_only_mode",
+                "llm_rewrite_used": False,
+                "llm_rewrite_error": None,
+                "candidate_count": len(candidate_bugs),
+                "llm_candidate_count": 0,
+                "final_bug_count": len(candidate_bugs),
+            },
+        }
 
     rewrite_result = try_llm_rewrite(
         file_path=file_path,

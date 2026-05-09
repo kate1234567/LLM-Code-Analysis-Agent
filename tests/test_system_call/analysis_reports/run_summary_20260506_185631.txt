@@ -1,0 +1,37 @@
+LLM AGENT ANALYSIS SUMMARY
+========================================
+Project path: C:/Users/katew/source/repos/LLM/tests/test_system_call
+Generated at: 2026-05-06T18:56:31.775159
+
+SUMMARY
+--------------------
+Files analyzed: 1
+Total bugs: 1
+Local findings: 1
+Interfile findings: 0
+High severity: 1
+Medium severity: 0
+Low severity: 0
+LLM results: 0
+Fallback results: 1
+Fallback timeouts: 0
+LLM other rewrite errors: 1
+LLM parse errors: 0
+Analysis mode: full
+Max workers: 1
+
+COMPARISON
+--------------------
+Previous report: None
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 0
+
+UNCHANGED FINDINGS WITH CHANGES
+------------------------------
+FILES
+--------------------
+File: C:/Users/katew/source/repos/LLM/tests/test_system_call\main.cpp
+Source type: fallback
+Bugs: 1
+  - unsafe-command-execution | severity=high | lines=7-7 | scope=local

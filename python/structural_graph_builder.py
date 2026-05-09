@@ -1,3 +1,5 @@
+import os
+
 def build_structural_graph(clang_ast_report, dependency_graph, function_graph):
     nodes = []
     edges = []
@@ -42,12 +44,23 @@ def build_structural_graph(clang_ast_report, dependency_graph, function_graph):
             continue
 
         for include in node.get("includes", []):
-            edges.append({
-                "from": f"file:{file_path}",
-                "to": f"include:{include}",
-                "type": "include_dependency"
-            })
+            target_file = None
 
+            for candidate_path in dependency_graph.keys():
+                candidate_norm = candidate_path.replace("\\", "/").lower()
+                include_norm = include.replace("\\", "/").lower()
+
+                if candidate_norm.endswith(include_norm):
+                    target_file = candidate_path
+                    break
+
+            if target_file:
+                edges.append({
+                    "from": f"file:{file_path}",
+                    "to": f"file:{target_file}",
+                    "type": "include_dependency",
+                    "weight": 1
+                })
     for file_path, node in function_graph.items():
         for call in node.get("external_calls", []):
             edges.append({

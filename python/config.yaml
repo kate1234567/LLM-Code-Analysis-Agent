@@ -1,8 +1,10 @@
 project_root: C:/Users/katew/source/repos
 
-worktree_path: C:/Users/katew/source/repos/LLM_feature
+worktree_path: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle
 
 json_context_path: C:/Users/katew/source/repos/LLM/python/project_context.json
+
+temp_repo_path: C:/Users/katew/source/repos/temp_repo
 
 reports_path: C:/Users/katew/source/repos/LLM/analysis_reports
 
@@ -16,7 +18,7 @@ default_workers: 4
 
 default_base_branch: main
 
-default_source_branch: feature-test
+default_source_branch: main
 
 default_target_branch: main
 

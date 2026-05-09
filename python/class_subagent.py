@@ -1,4 +1,5 @@
 import json
+import re
 from collections import defaultdict
 
 
@@ -11,19 +12,47 @@ def normalize_severity(severity):
     return severity
 
 
-def extract_classes_from_symbols(symbols):
-    if not symbols:
-        return []
-
-    classes = symbols.get("classes", [])
-
+def extract_classes_from_symbols(symbols, file_path="", file_code=""):
     result = []
 
-    for cls in classes:
-        if isinstance(cls, str):
-            result.append(cls)
+    if symbols:
+        classes = symbols.get("classes", [])
 
-    return result
+        for cls in classes:
+            if isinstance(cls, str):
+                result.append(cls)
+
+    if result:
+        return list(set(result))
+
+    lines = file_code.splitlines()
+    ext = file_path.lower()
+
+    patterns = []
+
+    if ext.endswith(".py"):
+        patterns = [
+            r"^\s*class\s+([A-Za-z_]\w*)"
+        ]
+
+    elif ext.endswith(".java"):
+        patterns = [
+            r"\bclass\s+([A-Za-z_]\w*)"
+        ]
+
+    elif ext.endswith(".js") or ext.endswith(".ts"):
+        patterns = [
+            r"\bclass\s+([A-Za-z_]\w*)"
+        ]
+
+    for line in lines:
+        for pattern in patterns:
+            match = re.search(pattern, line)
+
+            if match:
+                result.append(match.group(1))
+
+    return list(set(result))
 
 
 def detect_class_risks(class_name, file_path, bugs):
@@ -113,7 +142,11 @@ def run_class_subagents(results):
         bugs = parsed.get("bugs", [])
 
         symbols = item.get("symbols", {})
-        classes = extract_classes_from_symbols(symbols)
+        classes = extract_classes_from_symbols(
+            symbols,
+            file_path,
+            item.get("file_code", "")
+        )
 
         if not classes:
             continue

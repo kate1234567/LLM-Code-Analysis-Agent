@@ -1,0 +1,61 @@
+FINAL PROJECT REVIEW REPORT
+============================================================
+Generated at: 2026-05-06T19:11:26.178513
+Project path: C:/Users/katew/source/repos/LLM/tests/test_false_positive
+
+1. PROJECT-WIDE CONTEXT
+------------------------------------------------------------
+Graph nodes: 1
+Dependency edges: 0
+Files with reverse dependencies: 0
+Interfile findings: 0
+LLM provider: auto
+LLM model: deepseek-coder
+
+2. PROJECT SUMMARY
+------------------------------------------------------------
+Files analyzed: 1
+Total findings: 0
+Local findings: 0
+Interfile findings: 0
+LLM results: 0
+Fallback results: 1
+Analysis mode: full
+Max workers: 1
+
+3. CHANGED FILES
+------------------------------------------------------------
+- no changed files were passed
+
+4. FILE-LEVEL FINDINGS
+------------------------------------------------------------
+No findings detected.
+5. INTERFILE FINDINGS
+------------------------------------------------------------
+No interfile findings detected.
+6. MODULE ARCHITECTURE FINDINGS
+------------------------------------------------------------
+No architecture-level findings detected.
+
+7. COMPARISON WITH PREVIOUS RUN
+------------------------------------------------------------
+Previous report: None
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 0
+
+
+8. EVALUATION METRICS
+------------------------------------------------------------
+Ground truth bugs: 3
+Detected by agent: 0
+True positive: 0
+False positive: 0
+False negative: 3
+Precision: 0%
+Recall: 0.0%
+F1-score: 0%
+
+9. CONCLUSION
+------------------------------------------------------------
+The project has low detected risk based on the current analysis.

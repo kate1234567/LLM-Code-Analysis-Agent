@@ -1,0 +1,161 @@
+{
+  "project_id": "732c0b1f-43b8-4d68-8576-601f512ee65c",
+  "pr_id": "61c77aee-8043-47eb-8911-960256c96635",
+  "project_path": "C:/Users/katew/source/repos/LLM/tests/test_false_positive",
+  "generated_at": "2026-05-06T19:11:26.178513",
+  "changed_files": [],
+  "summary": {
+    "status": "success",
+    "results_count": 1,
+    "total_bugs": 0,
+    "local_findings_count": 0,
+    "interfile_findings_count": 0,
+    "llm_count": 0,
+    "fallback_count": 1,
+    "high_count": 0,
+    "medium_count": 0,
+    "low_count": 0,
+    "paired_header_count": 0,
+    "no_paired_header_count": 1,
+    "related_cpp_count": 0,
+    "no_related_cpp_count": 1,
+    "fallback_timeout_count": 0,
+    "llm_other_error_count": 0,
+    "llm_parse_error_count": 0,
+    "analysis_mode": "full",
+    "execution_mode": "sequential",
+    "max_workers": 1,
+    "graph_nodes": 1,
+    "structural_graph_nodes": 1,
+    "structural_graph_edges": 0,
+    "structural_graph_types": [
+      "file_dependency_graph",
+      "function_call_graph",
+      "class_structure_graph",
+      "ownership_risk_graph"
+    ],
+    "dependency_edges": 0,
+    "function_graph_nodes": 1,
+    "function_graph_edges": 0,
+    "clang_ast_files": 1,
+    "clang_ast_classes": 0,
+    "clang_ast_functions": 1,
+    "clang_ast_raw_pointer_fields": 0,
+    "files_with_reverse_deps_count": 0,
+    "llm_provider": "auto",
+    "llm_model": "deepseek-coder",
+    "files_by_language": {
+      "cpp": 1
+    },
+    "supported_languages": [
+      "cpp"
+    ],
+    "deep_analysis_languages": [
+      "cpp",
+      "c"
+    ],
+    "routing_only_languages": []
+  },
+  "results": [
+    {
+      "file": "C:/Users/katew/source/repos/LLM/tests/test_false_positive\\main.cpp",
+      "task_id": "358d0b34-23b3-41ad-91fc-fc07603ebb6f",
+      "result": {
+        "file": "C:/Users/katew/source/repos/LLM/tests/test_false_positive\\main.cpp",
+        "bugs": [],
+        "fallback_used": true,
+        "fallback_reason": "",
+        "llm_rewrite_used": false,
+        "llm_rewrite_error": null,
+        "candidate_count": 0,
+        "llm_candidate_count": 0,
+        "final_bug_count": 0
+      },
+      "finding_ids": [],
+      "recommendation_ids": [],
+      "source_type": "fallback",
+      "has_paired_header": false,
+      "has_related_cpp": false,
+      "reverse_dependencies_count": 0,
+      "project_summary": {
+        "files_count": 1,
+        "cpp_count": 1,
+        "header_count": 0,
+        "graph_nodes": 1,
+        "dependency_edges": 0
+      }
+    }
+  ],
+  "module_reports": [
+    {
+      "module": "test_false_positive",
+      "files_count": 1,
+      "header_files_count": 0,
+      "cpp_files_count": 1,
+      "cache_files_count": 0,
+      "llm_files_count": 0,
+      "fallback_files_count": 1,
+      "interfile_findings_count": 0,
+      "high_severity_count": 0,
+      "reverse_dependencies_count": 0,
+      "cross_module_risk_score": 0,
+      "architecture_findings": []
+    }
+  ],
+  "class_reports": [],
+  "clang_ast_report": {
+    "C:/Users/katew/source/repos/LLM/tests/test_false_positive\\main.cpp": {
+      "file": "C:/Users/katew/source/repos/LLM/tests/test_false_positive\\main.cpp",
+      "success": true,
+      "error": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "main",
+          "kind": "FunctionDecl",
+          "location": {
+            "offset": 65,
+            "file": "C:/Users/katew/source/repos/LLM/tests/test_false_positive\\main.cpp",
+            "line": 5,
+            "col": 5,
+            "tokLen": 4
+          }
+        }
+      ],
+      "fields": [],
+      "classes_count": 0,
+      "functions_count": 1,
+      "fields_count": 0,
+      "raw_pointer_fields_count": 0
+    }
+  },
+  "structural_graph": {
+    "nodes": [
+      {
+        "id": "file:C:/Users/katew/source/repos/LLM/tests/test_false_positive\\main.cpp",
+        "type": "file",
+        "label": "C:/Users/katew/source/repos/LLM/tests/test_false_positive\\main.cpp"
+      }
+    ],
+    "edges": [],
+    "nodes_count": 1,
+    "edges_count": 0,
+    "graph_types": [
+      "file_dependency_graph",
+      "function_call_graph",
+      "class_structure_graph",
+      "ownership_risk_graph"
+    ]
+  },
+  "dependency_graph_svg": "\n    <svg width=\"100%\" height=\"260\" viewBox=\"0 0 1000 260\"\n         xmlns=\"http://www.w3.org/2000/svg\">\n        <defs>\n            <marker id=\"arrow\" markerWidth=\"10\" markerHeight=\"10\"\n                    refX=\"10\" refY=\"3\" orient=\"auto\">\n                <path d=\"M0,0 L10,3 L0,6 Z\" fill=\"#374151\" />\n            </marker>\n        </defs>\n    \n\n        <rect x=\"80\" y=\"60\" width=\"220\" height=\"50\"\n              rx=\"10\" ry=\"10\"\n              fill=\"#ffffff\"\n              stroke=\"#111827\"\n              stroke-width=\"2\" />\n\n        <text x=\"92\" y=\"90\"\n              font-family=\"Arial\"\n              font-size=\"14\"\n              fill=\"#111827\">\n            main.cpp\n        </text>\n        \n</svg>",
+  "routing_only_files": [],
+  "comparison": {
+    "previous_report_path": null,
+    "new_findings_count": 0,
+    "resolved_findings_count": 0,
+    "unchanged_findings_count": 0,
+    "new_findings": [],
+    "resolved_findings": [],
+    "unchanged_findings": []
+  }
+}

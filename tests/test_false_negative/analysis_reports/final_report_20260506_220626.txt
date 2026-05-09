@@ -1,0 +1,71 @@
+FINAL PROJECT REVIEW REPORT
+============================================================
+Generated at: 2026-05-06T22:06:26.267215
+Project path: C:/Users/katew/source/repos/LLM/tests/test_false_negative
+
+1. PROJECT-WIDE CONTEXT
+------------------------------------------------------------
+Graph nodes: 1
+Dependency edges: 0
+Files with reverse dependencies: 0
+Interfile findings: 0
+LLM provider: auto
+LLM model: deepseek-coder
+
+2. PROJECT SUMMARY
+------------------------------------------------------------
+Files analyzed: 1
+Total findings: 1
+Local findings: 1
+Interfile findings: 0
+LLM results: 1
+Fallback results: 0
+Analysis mode: full
+Max workers: 1
+
+3. CHANGED FILES
+------------------------------------------------------------
+- no changed files were passed
+
+4. FILE-LEVEL FINDINGS
+------------------------------------------------------------
+1. [HIGH] unsafe-command-execution
+   File: C:/Users/katew/source/repos/LLM/tests/test_false_negative\main.cpp
+   Lines: 5-5
+   Scope: local
+   Cause: Use of system may allow unsafe command execution or command injection.
+   Fix: Avoid raw shell execution when possible. Validate inputs and prefer safer process APIs.
+
+5. INTERFILE FINDINGS
+------------------------------------------------------------
+No interfile findings detected.
+6. MODULE ARCHITECTURE FINDINGS
+------------------------------------------------------------
+Module: test_false_negative
+  - [HIGH] Unsafe external command execution
+    Cause: The module executes shell/system commands, which may create command injection risks.
+    Files: C:/Users/katew/source/repos/LLM/tests/test_false_negative\main.cpp
+
+
+7. COMPARISON WITH PREVIOUS RUN
+------------------------------------------------------------
+Previous report: None
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 0
+
+
+8. EVALUATION METRICS
+------------------------------------------------------------
+Ground truth bugs: 3
+Detected by agent: 1
+True positive: 0
+False positive: 1
+False negative: 3
+Precision: 0.0%
+Recall: 0.0%
+F1-score: 0%
+
+9. CONCLUSION
+------------------------------------------------------------
+The project contains high-risk findings. Manual review is recommended before merging.

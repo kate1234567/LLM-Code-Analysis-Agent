@@ -1,0 +1,92 @@
+FINAL PROJECT REVIEW REPORT
+============================================================
+Generated at: 2026-05-06T18:47:55.081182
+Project path: C:/Users/katew/source/repos/LLM/tests/test_interfile
+
+1. PROJECT-WIDE CONTEXT
+------------------------------------------------------------
+Graph nodes: 2
+Dependency edges: 1
+Files with reverse dependencies: 1
+Interfile findings: 2
+LLM provider: auto
+LLM model: deepseek-coder
+
+2. PROJECT SUMMARY
+------------------------------------------------------------
+Files analyzed: 2
+Total findings: 2
+Local findings: 0
+Interfile findings: 2
+LLM results: 2
+Fallback results: 0
+Analysis mode: full
+Max workers: 2
+
+3. CHANGED FILES
+------------------------------------------------------------
+- no changed files were passed
+
+4. FILE-LEVEL FINDINGS
+------------------------------------------------------------
+1. [MEDIUM] manual-allocation-without-visible-release
+   File: C:/Users/katew/source/repos/LLM/tests/test_interfile\utils.cpp
+   Lines: 5-5
+   Scope: interfile
+   Cause: Implementation performs manual allocation for an interface exposing raw pointers, but no matching release operation is visible in the implementation.
+   Fix: Add explicit cleanup logic or replace manual ownership with RAII-based abstractions.
+
+2. [HIGH] raw-pointer-interface-without-release
+   File: C:/Users/katew/source/repos/LLM/tests/test_interfile\utils.h
+   Lines: 3-3
+   Scope: interfile
+   Cause: Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.
+   Fix: Add explicit safe cleanup logic or replace the interface and implementation with RAII-based ownership.
+
+5. INTERFILE FINDINGS
+------------------------------------------------------------
+1. [MEDIUM] manual-allocation-without-visible-release
+   File: C:/Users/katew/source/repos/LLM/tests/test_interfile\utils.cpp
+   Lines: 5-5
+   Cause: Implementation performs manual allocation for an interface exposing raw pointers, but no matching release operation is visible in the implementation.
+   Fix: Add explicit cleanup logic or replace manual ownership with RAII-based abstractions.
+
+2. [HIGH] raw-pointer-interface-without-release
+   File: C:/Users/katew/source/repos/LLM/tests/test_interfile\utils.h
+   Lines: 3-3
+   Cause: Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.
+   Fix: Add explicit safe cleanup logic or replace the interface and implementation with RAII-based ownership.
+
+6. MODULE ARCHITECTURE FINDINGS
+------------------------------------------------------------
+Module: test_interfile
+  - [HIGH] Inter-file ownership/lifetime issue
+    Cause: Several findings depend on relations between header and implementation files.
+    Files: C:/Users/katew/source/repos/LLM/tests/test_interfile\utils.cpp, C:/Users/katew/source/repos/LLM/tests/test_interfile\utils.h
+  - [HIGH] Unsafe raw pointer design across module
+    Cause: Raw pointers or manual memory management appear in several module files.
+    Files: C:/Users/katew/source/repos/LLM/tests/test_interfile\utils.cpp, C:/Users/katew/source/repos/LLM/tests/test_interfile\utils.h
+
+
+7. COMPARISON WITH PREVIOUS RUN
+------------------------------------------------------------
+Previous report: None
+New findings: 0
+Resolved findings: 0
+Unchanged findings: 0
+
+
+8. EVALUATION METRICS
+------------------------------------------------------------
+Ground truth bugs: 3
+Detected by agent: 2
+True positive: 0
+False positive: 2
+False negative: 3
+Precision: 0.0%
+Recall: 0.0%
+F1-score: 0%
+
+9. CONCLUSION
+------------------------------------------------------------
+The project contains high-risk findings. Manual review is recommended before merging.

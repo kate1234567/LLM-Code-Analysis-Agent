@@ -11,9 +11,14 @@ def run_clang_ast_dump(file_path):
     command = [
         r"C:\Program Files\LLVM\bin\clang++.exe",
         "-std=c++17",
+
+        "-nostdinc++",
+
         "-Xclang",
         "-ast-dump=json",
+
         "-fsyntax-only",
+
         file_path
     ]
 
@@ -78,8 +83,26 @@ def parse_ast_json(file_path, node):
     functions = []
     fields = []
 
+    normalized_target = os.path.abspath(file_path).replace("\\", "/").lower()
+
+    def is_from_target_file(current):
+        loc = current.get("loc", {})
+        source_file = loc.get("file", "")
+
+        if not source_file:
+            return False
+
+        normalized_source = os.path.abspath(source_file).replace("\\", "/").lower()
+
+        return normalized_source == normalized_target
+
     def walk(current):
         if not isinstance(current, dict):
+            return
+
+        if not is_from_target_file(current):
+            for child in current.get("inner", []):
+                walk(child)
             return
 
         kind = current.get("kind", "")
@@ -92,7 +115,12 @@ def parse_ast_json(file_path, node):
                 "location": current.get("loc", {})
             })
 
-        if kind in {"FunctionDecl", "CXXMethodDecl", "CXXConstructorDecl", "CXXDestructorDecl"} and name:
+        if kind in {
+            "FunctionDecl",
+            "CXXMethodDecl",
+            "CXXConstructorDecl",
+            "CXXDestructorDecl"
+        } and name:
             functions.append({
                 "name": name,
                 "kind": kind,
@@ -129,7 +157,6 @@ def parse_ast_json(file_path, node):
             if field.get("is_raw_pointer")
         ])
     }
-
 
 def build_clang_ast_report(files):
     report = {}

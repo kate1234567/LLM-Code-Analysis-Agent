@@ -1,0 +1,25 @@
+[
+  {
+    "module": "test_mixed_project",
+    "files_count": 2,
+    "header_files_count": 0,
+    "cpp_files_count": 2,
+    "cache_files_count": 0,
+    "llm_files_count": 1,
+    "fallback_files_count": 1,
+    "interfile_findings_count": 0,
+    "high_severity_count": 1,
+    "reverse_dependencies_count": 0,
+    "cross_module_risk_score": 2,
+    "architecture_findings": [
+      {
+        "problem": "Unsafe external command execution",
+        "cause": "The module executes shell/system commands, which may create command injection risks.",
+        "files": [
+          "C:/Users/katew/source/repos/LLM/tests/test_mixed_project\\unsafe.cpp"
+        ],
+        "severity": "high"
+      }
+    ]
+  }
+]

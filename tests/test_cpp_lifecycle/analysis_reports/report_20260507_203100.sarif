@@ -1,0 +1,126 @@
+{
+    "version": "2.1.0",
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "LLM Agent Code Analyzer",
+                    "version": "1.0",
+                    "rules": [
+                        {
+                            "id": "RawPointerOwnership",
+                            "name": "Raw Pointer Ownership Risk",
+                            "shortDescription": {
+                                "text": "Unsafe raw pointer ownership detected"
+                            },
+                            "fullDescription": {
+                                "text": "Manual ownership management may cause leaks, double free, or invalid memory access."
+                            },
+                            "help": {
+                                "text": "Use RAII and smart pointers like std::unique_ptr or std::shared_ptr."
+                            }
+                        },
+                        {
+                            "id": "UnsafeSystemCall",
+                            "name": "Unsafe System Command Execution",
+                            "shortDescription": {
+                                "text": "Unsafe system() or _popen() usage detected"
+                            },
+                            "fullDescription": {
+                                "text": "Direct shell execution may introduce security risks and command injection vulnerabilities."
+                            },
+                            "help": {
+                                "text": "Use safer process APIs and validate all external inputs."
+                            }
+                        },
+                        {
+                            "id": "ManualMemoryManagement",
+                            "name": "Manual Memory Management Risk",
+                            "shortDescription": {
+                                "text": "Manual allocation patterns detected"
+                            },
+                            "fullDescription": {
+                                "text": "Manual memory allocation increases the probability of memory leaks and invalid access."
+                            },
+                            "help": {
+                                "text": "Prefer STL containers and RAII over malloc/new/delete patterns."
+                            }
+                        },
+                        {
+                            "id": "GeneralCodeRisk",
+                            "name": "General Code Quality Risk",
+                            "shortDescription": {
+                                "text": "General code quality issue detected"
+                            },
+                            "fullDescription": {
+                                "text": "Potential maintainability, reliability, or architectural issue detected by analysis."
+                            },
+                            "help": {
+                                "text": "Review the issue manually and apply project-specific best practices."
+                            }
+                        }
+                    ]
+                }
+            },
+            "results": [
+                {
+                    "ruleId": "RawPointerOwnership",
+                    "level": "error",
+                    "message": {
+                        "text": "raw-pointer-interface-without-release"
+                    },
+                    "properties": {
+                        "cause": "Header exposes raw pointer ownership semantics, related implementation performs manual allocation, but no matching release operation is visible.",
+                        "fix": "Add explicit safe cleanup logic or replace the interface and implementation with RAII-based ownership.",
+                        "scope": "interfile",
+                        "confidence_score": 1.0,
+                        "validation_status": "VALIDATED",
+                        "priority_score": 105
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\\user.h"
+                                },
+                                "region": {
+                                    "startLine": 5,
+                                    "endLine": 5
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ruleId": "RawPointerOwnership",
+                    "level": "warning",
+                    "message": {
+                        "text": "unsafe-pointer-return-interface"
+                    },
+                    "properties": {
+                        "cause": "Header exposes an interface returning raw char pointers, which may lead to unsafe ownership handling.",
+                        "fix": "Prefer std::string, std::vector<char> or smart pointer based interfaces for safer memory management and avoid potential issues with manual allocation/deallocation of dynamic resources. Also consider using unique_ptr instead if possible as it is more modern way in C++14 onwards.",
+                        "scope": "local",
+                        "confidence_score": 0.7,
+                        "validation_status": "VALIDATED",
+                        "priority_score": 65
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle\\user.h"
+                                },
+                                "region": {
+                                    "startLine": 9,
+                                    "endLine": 9
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

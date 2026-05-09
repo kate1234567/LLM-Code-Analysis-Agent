@@ -1,0 +1,583 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LLM Agent Analysis Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        h1, h2 {
+            color: #1f2937;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card-title {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .risk-high {
+            color: #b91c1c;
+        }
+
+        .risk-medium {
+            color: #b45309;
+        }
+
+        .risk-low {
+            color: #047857;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        th {
+            background: #111827;
+            color: white;
+        }
+
+        .severity-high {
+            color: #b91c1c;
+            font-weight: bold;
+        }
+
+        .severity-medium {
+            color: #b45309;
+            font-weight: bold;
+        }
+
+        .severity-low {
+            color: #047857;
+            font-weight: bold;
+        }
+
+        .module-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .small {
+            color: #666;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h1>LLM Agent Analysis Report</h1>
+    <div class="module-card">
+    <h2>Executive Summary</h2>
+
+    <p>
+        Overall project risk level:
+        <b class="risk-high">HIGH</b>
+    </p>
+
+    <p>
+        The most critical risks are related to:
+    </p>
+
+    <ul>
+        <li>interfile ownership issues</li>
+        <li>manual memory management</li>
+        <li>unsafe command execution</li>
+        <li>raw pointer interface exposure</li>
+    </ul>
+
+    <p>
+        Manual review is strongly recommended before merge.
+    </p>
+</div>
+<div class="module-card">
+    <h2>Top Immediate Actions</h2>
+
+    <ol>
+        <li>Replace raw pointer ownership with RAII</li>
+        <li>Remove unsafe system/_popen usage</li>
+        <li>Eliminate strcpy/manual allocation patterns</li>
+    </ol>
+</div>
+<div class="module-card">
+    <h2>LLM Decision Example</h2>
+
+    <p>
+        This block demonstrates where Large Language Model reasoning
+        is used beyond static rules and regex-based checks.
+    </p>
+
+    <p>
+        <b>Target file:</b> utils.h + utils.cpp
+    </p>
+
+    <p>
+        <b>Task for LLM:</b><br>
+        Analyze ownership semantics between header and implementation,
+        detect hidden lifetime risks and unsafe resource management.
+    </p>
+
+    <p>
+        <b>LLM conclusion:</b><br>
+        Public interface exposes raw pointer ownership without explicit
+        release strategy, while implementation performs manual allocation.
+        This creates hidden ownership ambiguity and possible memory leaks.
+    </p>
+
+    <p>
+        <b>Generated recommendation:</b><br>
+        Replace raw pointer API with RAII-based ownership
+        (std::unique_ptr / std::shared_ptr)
+        or introduce explicit safe cleanup strategy.
+    </p>
+</div>
+    <p class="small">Generated at: 2026-05-06T22:08:11.055577</p>
+    <p class="small">Project path: C:/Users/katew/source/repos/LLM/tests/test_mixed_project</p>
+
+    <h2>Project Summary</h2>
+
+<div class="summary-grid">
+
+    <div class="card">
+    <div class="card-title">PR Review Status</div>
+    <div class="card-value risk-high">
+        MANUAL REVIEW REQUIRED
+    </div>
+</div>
+    <div class="card">
+        <div class="card-title">Risk level</div>
+        <div class="card-value risk-high">HIGH</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Files analyzed</div>
+        <div class="card-value">2</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Total findings</div>
+        <div class="card-value">1</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Interfile findings</div>
+        <div class="card-value">0</div>
+    </div>
+    <div class="card">
+        <div class="card-title">High severity</div>
+        <div class="card-value risk-high">1</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Medium severity</div>
+        <div class="card-value risk-medium">0</div>
+    </div>
+    <div class="card">
+        <div class="card-title">LLM results</div>
+        <div class="card-value">1</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Max workers</div>
+        <div class="card-value">2</div>
+    </div>
+</div>
+
+<h2>Project-wide Context</h2>
+
+<div class="summary-grid">
+    <div class="card">
+        <div class="card-title">Graph nodes</div>
+        <div class="card-value">2</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Dependency edges</div>
+        <div class="card-value">0</div>
+    </div>
+    <div class="card">
+    <div class="card-title">Function graph nodes</div>
+    <div class="card-value">2</div>
+    </div>
+
+    <div class="card">
+    <div class="card-title">Function graph edges</div>
+    <div class="card-value">0</div>
+    </div>
+
+    <div class="card">
+    <div class="card-title">Supported languages</div>
+    <div class="card-value">cpp</div>
+</div>
+</div>
+
+<h2>Dependency Graph Visualization</h2>
+<div class="module-card">
+    
+    <svg width="100%" height="260" viewBox="0 0 1000 260"
+         xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10"
+                    refX="10" refY="3" orient="auto">
+                <path d="M0,0 L10,3 L0,6 Z" fill="#374151" />
+            </marker>
+        </defs>
+    
+
+        <rect x="80" y="60" width="220" height="50"
+              rx="10" ry="10"
+              fill="#ffffff"
+              stroke="#111827"
+              stroke-width="2" />
+
+        <text x="92" y="90"
+              font-family="Arial"
+              font-size="14"
+              fill="#111827">
+            safe.cpp
+        </text>
+        
+
+        <rect x="620" y="150" width="220" height="50"
+              rx="10" ry="10"
+              fill="#ffffff"
+              stroke="#111827"
+              stroke-width="2" />
+
+        <text x="632" y="180"
+              font-family="Arial"
+              font-size="14"
+              fill="#111827">
+            unsafe.cpp
+        </text>
+        
+</svg>
+</div>
+
+<div class="summary-grid">
+<div class="card">
+    <div class="card-title">Files with reverse dependencies</div>
+    <div class="card-value">0</div>
+</div>
+    <div class="card">
+        <div class="card-title">LLM provider</div>
+        <div class="card-value">auto</div>
+    </div>
+    <div class="card">
+        <div class="card-title">LLM model</div>
+        <div class="card-value">deepseek-coder</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Analysis mode</div>
+        <div class="card-value">full</div>
+    </div>
+</div>
+<h2>Clang AST Structural Analysis</h2>
+
+<div class="summary-grid">
+    <div class="card">
+        <div class="card-title">AST files</div>
+        <div class="card-value">2</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Classes detected</div>
+        <div class="card-value">0</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Functions detected</div>
+        <div class="card-value">2</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Raw pointer fields</div>
+        <div class="card-value risk-high">
+            0
+        </div>
+    </div>
+</div>
+
+
+        <div class="module-card">
+            <h3>tests/test_mixed_project/safe.cpp</h3>
+
+            <p>
+                <b>Classes:</b> 0<br>
+                <b>Functions:</b> 1<br>
+                <b>Raw pointer fields:</b>
+                <span class="risk-high">
+                    0
+                </span>
+            </p>
+
+            <ul>
+                
+            </ul>
+        </div>
+        
+        <div class="module-card">
+            <h3>tests/test_mixed_project/unsafe.cpp</h3>
+
+            <p>
+                <b>Classes:</b> 0<br>
+                <b>Functions:</b> 1<br>
+                <b>Raw pointer fields:</b>
+                <span class="risk-high">
+                    0
+                </span>
+            </p>
+
+            <ul>
+                
+            </ul>
+        </div>
+        
+
+<h2>Languages</h2>
+<div class="summary-grid">
+    
+        <div class="card">
+            <div class="card-title">cpp</div>
+            <div class="card-value">2</div>
+        </div>
+        
+</div>
+<h2>Top Critical Interfile Risks</h2>
+
+<div class="module-card">
+    <h3>Why Interfile Risks Matter</h3>
+
+    <p>
+        Interfile findings represent issues that cannot be detected
+        by isolated single-file analysis.
+    </p>
+
+    <p>
+        These problems appear only when analyzing relationships
+        between headers, source files, ownership models,
+        and reverse dependencies across the whole project.
+    </p>
+
+    <p>
+        This is the key advantage of the proposed LLM-agent approach.
+    </p>
+</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Priority</th>
+                <th>Impact Radius</th>
+                <th>Bug</th>
+                <th>Severity</th>
+                <th>File</th>
+                <th>Lines</th>
+                <th>Cause</th>
+                <th>Recommendation</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+</div>
+
+<h2>Top Priority Findings</h2>
+
+<div class="module-card">
+    <h3>Priority Score Logic</h3>
+
+    <p>
+        Priority score is calculated using several factors:
+    </p>
+
+    <ul>
+        <li><b>Severity:</b> high > medium > low</li>
+        <li><b>Finding scope:</b> interfile issues receive higher weight</li>
+        <li><b>Changed file bonus:</b> modified files are prioritized</li>
+        <li><b>Historical findings:</b> repeated issues increase priority</li>
+        <li><b>Reverse dependencies:</b> files affecting many others receive higher priority</li>
+    </ul>
+
+    <p>
+        This allows the system to rank findings by real project impact,
+        not only by isolated local severity.
+    </p>
+</div>
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Priority</th>
+                <th>Bug</th>
+                <th>Severity</th>
+                <th>Scope</th>
+                <th>File</th>
+                <th>Lines</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+                    <tr>
+                        <td><b>60</b></td>
+                        <td>unsafe-command-execution</td>
+                        <td>
+                            <span class="severity-high">
+                                HIGH
+                            </span>
+                        </td>
+                        <td>local</td>
+                        <td>unsafe.cpp</td>
+                        <td>5-5</td>
+                    </tr>
+                    
+        </tbody>
+    </table>
+</div>
+<h2>File-level Findings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Severity</th>
+                <th>Bug</th>
+                <th>Scope</th>
+                <th>File</th>
+                <th>Lines</th>
+                <th>Cause</th>
+                <th>Fix</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr>
+            <td><span class="severity-high">HIGH</span></td>
+            <td>unsafe-command-execution</td>
+            <td>local</td>
+            <td>unsafe.cpp</td>
+            <td>5-5</td>
+            <td>Use of system function can lead to unsafe command execution or injection.</td>
+            <td>Avoid raw shell commands when possible. Validate inputs and use safer process APIs instead.</td>
+        </tr>
+        
+        </tbody>
+    </table>
+<h2>Top Risk Modules</h2>
+
+
+        <div class="module-card">
+            <h3>test_mixed_project</h3>
+
+            <p>
+                <b>Risk Score:</b>
+                <span class="risk-high">2</span>
+            </p>
+
+            <p>
+                Interfile findings: 0<br>
+                High severity findings: 1<br>
+                Reverse dependencies: 0
+            </p>
+        </div>
+        
+    <h2>Module Architecture Findings</h2>
+    
+        <div class="module-card">
+            <h3>test_mixed_project</h3>
+
+            <p>
+                <b>Module Risk Score:</b>
+                <span class="risk-high">2</span>
+            </p>
+
+            <p>
+                Interfile findings: 0<br>
+                High severity findings: 1<br>
+                Reverse dependencies: 0
+            </p>
+
+            <ul>
+                
+            <li>
+                <b>Unsafe external command execution</b>
+                <br>
+                Severity:
+                <span class="severity-high">
+                    HIGH
+                </span>
+                <br>
+                Cause: The module executes shell/system commands, which may create command injection risks.
+                <br>
+                Files: unsafe.cpp
+            </li>
+            
+            </ul>
+        </div>
+        
+    
+
+    <h2>Comparison With Previous Run</h2>
+    <div class="card">
+        
+    <p><b>First analysis run</b></p>
+    <p>No previous reports found</p>
+    
+        <p>New findings: 0</p>
+        <p>Resolved findings: 0</p>
+        <p>Unchanged findings: 0</p>
+    </div>
+    <h2>Unchanged Findings Evolution</h2>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>File</th>
+                <th>Bug</th>
+                <th>Lines</th>
+                <th>Scope</th>
+                <th>Severity</th>
+                <th>Changes</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

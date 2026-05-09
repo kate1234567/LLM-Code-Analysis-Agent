@@ -1,0 +1,61 @@
+FINAL PROJECT REVIEW REPORT
+============================================================
+Generated at: 2026-05-07T03:54:53.088481
+Project path: C:/Users/katew/source/repos/LLM/tests/test_multilanguage_graph
+
+1. PROJECT-WIDE CONTEXT
+------------------------------------------------------------
+Graph nodes: 3
+Dependency edges: 3
+Files with reverse dependencies: 0
+Interfile findings: 0
+LLM provider: auto
+LLM model: deepseek-coder
+
+2. PROJECT SUMMARY
+------------------------------------------------------------
+Files analyzed: 3
+Total findings: 0
+Local findings: 0
+Interfile findings: 0
+LLM results: 0
+Fallback results: 0
+Analysis mode: full
+Max workers: 3
+
+3. CHANGED FILES
+------------------------------------------------------------
+- no changed files were passed
+
+4. FILE-LEVEL FINDINGS
+------------------------------------------------------------
+No findings detected.
+5. INTERFILE FINDINGS
+------------------------------------------------------------
+No interfile findings detected.
+6. MODULE ARCHITECTURE FINDINGS
+------------------------------------------------------------
+No architecture-level findings detected.
+
+7. COMPARISON WITH PREVIOUS RUN
+------------------------------------------------------------
+Previous report: C:/Users/katew/source/repos/LLM/tests/test_multilanguage_graph\analysis_reports\run_report_20260507_032537.json
+New findings: 0
+Resolved findings: 6
+Unchanged findings: 0
+
+
+8. EVALUATION METRICS
+------------------------------------------------------------
+Ground truth bugs: 3
+Detected by agent: 0
+True positive: 0
+False positive: 0
+False negative: 3
+Precision: 0%
+Recall: 0.0%
+F1-score: 0%
+
+9. CONCLUSION
+------------------------------------------------------------
+The project has low detected risk based on the current analysis.

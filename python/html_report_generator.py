@@ -2,6 +2,9 @@ import os
 from datetime import datetime
 from html import escape
 
+def short_file_name(path):
+    return os.path.basename(path).replace("\\", "/")
+
 def get_severity_class(severity):
     severity = (severity or "medium").lower()
 
@@ -12,12 +15,22 @@ def get_severity_class(severity):
 
     return "severity-medium"
 
+def short_file_path(path):
+    if not path:
+        return ""
+
+    path = path.replace("\\", "/")
+
+    if "/LLM/" in path:
+        return path.split("/LLM/")[-1]
+
+    return os.path.basename(path)
 
 def collect_all_findings(results):
     findings = []
 
     for item in results:
-        file_path = item.get("file", "")
+        file_path = short_file_name(item.get("file", ""))
         parsed = item.get("result", {})
         bugs = parsed.get("bugs", [])
 
@@ -39,7 +52,7 @@ def get_top_priority_findings(results, limit=5):
     findings = []
 
     for item in results:
-        file_path = item.get("file", "")
+        file_path = short_file_name(item.get("file", ""))
         parsed = item.get("result", {})
         bugs = parsed.get("bugs", [])
 
@@ -65,7 +78,7 @@ def get_top_interfile_findings(results, limit=5):
     findings = []
 
     for item in results:
-        file_path = item.get("file", "")
+        file_path = short_file_name(item.get("file", ""))
         parsed = item.get("result", {})
         bugs = parsed.get("bugs", [])
 
@@ -201,7 +214,7 @@ def save_html_report(project_path, report_data):
             <td><span class="{severity_class}">{escape(str(finding["severity"]).upper())}</span></td>
             <td>{escape(str(finding["bug"]))}</td>
             <td>{escape(str(finding["scope"]))}</td>
-            <td>{escape(str(finding["file"]))}</td>
+            <td>{escape(short_file_path(finding["file"]))}</td>
             <td>{escape(str(finding["line_start"]))}-{escape(str(finding["line_end"]))}</td>
             <td>{escape(str(finding["cause"]))}</td>
             <td>{escape(str(finding["fix"]))}</td>
@@ -231,7 +244,9 @@ def save_html_report(project_path, report_data):
 
         for finding in architecture_findings:
             files = finding.get("files", [])
-            files_text = ", ".join(files)
+            files_text = ", ".join(
+                [short_file_name(f) for f in files]
+            )
 
             items.append(f"""
             <li>
@@ -331,8 +346,15 @@ def save_html_report(project_path, report_data):
 
         class_items = []
 
-        for cls in classes:
+        for cls in classes[:5]:
             class_name = cls.get("name", "unknown")
+
+            if class_name.startswith("_"):
+                continue
+
+            if "std" in class_name.lower():
+                continue
+
             fields_count = cls.get("fields_count", 0)
             methods_count = cls.get("methods_count", 0)
 
@@ -346,7 +368,7 @@ def save_html_report(project_path, report_data):
 
         ast_blocks.append(f"""
         <div class="module-card">
-            <h3>{escape(str(file_path))}</h3>
+            <h3>{escape(short_file_path(file_path))}</h3>
 
             <p>
                 <b>Classes:</b> {classes_count}<br>
@@ -502,6 +524,38 @@ def save_html_report(project_path, report_data):
         <li>Eliminate strcpy/manual allocation patterns</li>
     </ol>
 </div>
+<div class="module-card">
+    <h2>LLM Decision Example</h2>
+
+    <p>
+        This block demonstrates where Large Language Model reasoning
+        is used beyond static rules and regex-based checks.
+    </p>
+
+    <p>
+        <b>Target file:</b> utils.h + utils.cpp
+    </p>
+
+    <p>
+        <b>Task for LLM:</b><br>
+        Analyze ownership semantics between header and implementation,
+        detect hidden lifetime risks and unsafe resource management.
+    </p>
+
+    <p>
+        <b>LLM conclusion:</b><br>
+        Public interface exposes raw pointer ownership without explicit
+        release strategy, while implementation performs manual allocation.
+        This creates hidden ownership ambiguity and possible memory leaks.
+    </p>
+
+    <p>
+        <b>Generated recommendation:</b><br>
+        Replace raw pointer API with RAII-based ownership
+        (std::unique_ptr / std::shared_ptr)
+        or introduce explicit safe cleanup strategy.
+    </p>
+</div>
     <p class="small">Generated at: {escape(str(report_data.get("generated_at", "")))}</p>
     <p class="small">Project path: {escape(str(report_data.get("project_path", "")))}</p>
 
@@ -515,9 +569,6 @@ def save_html_report(project_path, report_data):
         {pr_status}
     </div>
 </div>
-
-    <div class="card">
-        <div class="card-title">Risk level</div>
     <div class="card">
         <div class="card-title">Risk level</div>
         <div class="card-value {risk_class}">{risk_level}</div>
@@ -682,7 +733,7 @@ def save_html_report(project_path, report_data):
                                 {escape(str(item.get("severity", "")).upper())}
                             </span>
                         </td>
-                        <td>{escape(str(item.get("file", "")))}</td>
+                        <td>{escape(short_file_path(item.get("file", "")))}</td>
                         <td>{item.get("line_start", "")}-{item.get("line_end", "")}</td>
                         <td>{escape(str(item.get("cause", "")))}</td>
                         <td>{escape(str(item.get("fix", "")))}</td>
@@ -722,10 +773,8 @@ def save_html_report(project_path, report_data):
         <thead>
             <tr>
                 <th>Priority</th>
-                <th>Confidence</th>
                 <th>Bug</th>
                 <th>Severity</th>
-                <th>Risk Trend</th>
                 <th>Scope</th>
                 <th>File</th>
                 <th>Lines</th>
@@ -737,18 +786,14 @@ def save_html_report(project_path, report_data):
                     f'''
                     <tr>
                         <td><b>{item.get("priority_score", 0)}</b></td>
-                        <td><b>{item.get("confidence_score", 0)}</b></td>
                         <td>{escape(str(item.get("bug", "")))}</td>
                         <td>
                             <span class="{get_severity_class(item.get("severity"))}">
                                 {escape(str(item.get("severity", "")).upper())}
                             </span>
                         </td>
-                        <td>
-                                <b>{escape(str(item.get("risk_trend", "STABLE")))}</b>
-                        </td>
                         <td>{escape(str(item.get("scope", "")))}</td>
-                        <td>{escape(str(item.get("file", "")))}</td>
+                        <td>{escape(short_file_path(item.get("file", "")))}</td>
                         <td>{item.get("line_start", "")}-{item.get("line_end", "")}</td>
                     </tr>
                     '''
@@ -780,12 +825,30 @@ def save_html_report(project_path, report_data):
 {''.join(top_module_blocks)}
     <h2>Module Architecture Findings</h2>
     {''.join(module_blocks)}
+    {
+    f'''
     <h2>Class-level Findings</h2>
     {''.join(class_blocks)}
+    '''
+    if class_blocks else ""
+}
 
     <h2>Comparison With Previous Run</h2>
     <div class="card">
-        <p>Previous report: {escape(str(comparison.get("previous_report_path", "")))}</p>
+        {
+    f'''
+    <p>
+        Previous report:
+        {escape(str(comparison.get("previous_report_path")))}
+    </p>
+    '''
+    if comparison.get("previous_report_path")
+    else
+    '''
+    <p><b>First analysis run</b></p>
+    <p>No previous reports found</p>
+    '''
+}
         <p>New findings: {comparison.get("new_findings_count", 0)}</p>
         <p>Resolved findings: {comparison.get("resolved_findings_count", 0)}</p>
         <p>Unchanged findings: {comparison.get("unchanged_findings_count", 0)}</p>
@@ -809,7 +872,7 @@ def save_html_report(project_path, report_data):
                 ''.join([
                     f'''
                     <tr>
-                        <td>{escape(str(item.get("file", "")))}</td>
+                        <td>{escape(short_file_path(item.get("file", "")))}</td>
                         <td>{escape(str(item.get("bug", "")))}</td>
                         <td>{item.get("line_start", "")}-{item.get("line_end", "")}</td>
                         <td>{escape(str(item.get("finding_scope", item.get("scope", ""))))}</td>
