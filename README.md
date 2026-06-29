@@ -23,7 +23,9 @@
 
 # Архитектура системы
 
-<img width="904" height="944" alt="image" src="https://github.com/user-attachments/assets/577e7f24-d304-4272-b746-f2dd35ee0d8a" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9bc94d39-cd1f-49bc-9719-522bb3bfd01f" width="800">
+</p>
 
 ---
 
@@ -65,7 +67,7 @@
 7. Формируется итоговый отчёт.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/9bc94d39-cd1f-49bc-9719-522bb3bfd01f" width="800">
+  <img src="https://github.com/user-attachments/assets/b50e5fed-d345-48e1-ac8c-f7ff777992c5" width="700">
 </p>
 
 ---
