@@ -64,7 +64,7 @@
 6. Результаты сохраняются в базе данных.
 7. Формируется итоговый отчёт.
 
-<img width="868" height="748" alt="image" src="https://github.com/user-attachments/assets/9eab97a4-f8c3-4185-a074-3077279171d6" />
+<img width="353" height="623" alt="21 drawio" src="https://github.com/user-attachments/assets/15f50d07-ab62-4d64-869c-a4ba493f0e80" />
 
 ---
 
