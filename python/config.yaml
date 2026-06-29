@@ -1,14 +1,14 @@
-project_root: C:/Users/katew/source/repos
+project_root: <project_root>
 
-worktree_path: C:/Users/katew/source/repos/LLM/tests/test_cpp_lifecycle
+worktree_path: <repository_path>
 
-json_context_path: C:/Users/katew/source/repos/LLM/python/project_context.json
+json_context_path: python/project_context.json
 
-temp_repo_path: C:/Users/katew/source/repos/temp_repo
+temp_repo_path: <temp_repo_path>
 
-reports_path: C:/Users/katew/source/repos/LLM/analysis_reports
+reports_path: <reports_path>
 
-python_command: py C:/Users/katew/source/repos/LLM/python/orchestrator.py
+python_command: py python/orchestrator.py
 
 default_provider: auto
 
@@ -26,7 +26,7 @@ db_name: llm
 
 db_user: postgres
 
-db_password: postgres
+db_password: <password>
 
 db_host: localhost
 
