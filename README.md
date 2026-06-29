@@ -24,7 +24,7 @@
 # Архитектура системы
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/9bc94d39-cd1f-49bc-9719-522bb3bfd01f" width="800">
+  <img src="https://github.com/user-attachments/assets/9bc94d39-cd1f-49bc-9719-522bb3bfd01f" width="300">
 </p>
 
 ---
@@ -67,7 +67,7 @@
 7. Формируется итоговый отчёт.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/b50e5fed-d345-48e1-ac8c-f7ff777992c5" width="700">
+  <img src="https://github.com/user-attachments/assets/b50e5fed-d345-48e1-ac8c-f7ff777992c5" width="300">
 </p>
 
 ---
@@ -86,14 +86,17 @@ tests/              Модульные тесты
 
 # База данных
 
-![Uploading image.png…]()
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/05d30341-b08d-457f-ad3e-2818328c95d0" width="450">
+</p>
 
 ---
 
 # Пример работы системы
 
-![Uploading image.png…]()
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/48c43a5d-3f97-4e68-bd37-69f83c2a92c3" width="550">
+</p>
 ---
 
 # Особенности проекта
